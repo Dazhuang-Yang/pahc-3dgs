@@ -30,10 +30,6 @@ body {
   font-family: 'Google Sans', sans-serif;
 }
 
-
-.publication-title {
-}
-
 .publication-banner {
   max-height: parent;
 
@@ -45,9 +41,6 @@ body {
   top: auto;
   transform: none;
   object-fit: fit;
-}
-
-.publication-header .hero-body {
 }
 
 .publication-title {
@@ -304,7 +297,7 @@ input:not(:checked)+label+.ci {
 
 .figure-card .figure-caption {
   margin-top: 0.75rem;
-  margin-bottom: 0;
+  margin-bottom: 0.75rem;
   font-size: 0.95rem;
   text-align: center;
   color: #555;

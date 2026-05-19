@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Size vs PSNR / Number of Points</title>
+  <link rel="stylesheet" href="../css/plots.css">
+</head>
+<body>
+  <div class="figure">
+    <div class="title">Structural Efficiency and Rate-Distortion Comparison</div>
+    <div style="height: 16px;"></div>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-title">Size vs Number of Points</div>
+        <div class="interaction-toolbar" aria-label="Interaction toolbar for points chart" >
+          <button class="tool-btn is-active" id="tool-pan-points" type="button" aria-label="Pan mode" title="Pan">
+            <img class="tool-img" src="../logo/move.svg" alt="Pan" data-dark="../logo/move.svg" data-light="../logo/move-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-zoom-points" type="button" aria-label="Zoom selection mode" title="Zoom selection">
+            <img class="tool-img" src="../logo/zoom-out.svg" alt="Zoom" data-dark="../logo/zoom-out.svg" data-light="../logo/zoom-out-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-home-points" type="button" aria-label="Reset view" title="Reset view">
+            <img class="tool-img" src="../logo/home.svg" alt="Reset" data-dark="../logo/home.svg" data-light="../logo/home-light.svg">
+          </button>
+        </div>
+        <div class="chart-wrap">
+          <svg id="chart-points" viewBox="0 0 540 360" aria-label="Size vs Number of Points chart"></svg>
+          <div class="tooltip" id="tooltip-points"></div>
+          <div class="selection-rect" id="sel-points"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Size vs PSNR</div>
+        <div class="interaction-toolbar" aria-label="Interaction toolbar for psnr chart">
+          <button class="tool-btn is-active" id="tool-pan-psnr" type="button" aria-label="Pan mode" title="Pan">
+            <img class="tool-img" src="../logo/move.svg" alt="Pan" data-dark="../logo/move.svg" data-light="../logo/move-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-zoom-psnr" type="button" aria-label="Zoom selection mode" title="Zoom selection">
+            <img class="tool-img" src="../logo/zoom-out.svg" alt="Zoom" data-dark="../logo/zoom-out.svg" data-light="../logo/zoom-out-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-home-psnr" type="button" aria-label="Reset view" title="Reset view">
+            <img class="tool-img" src="../logo/home.svg" alt="Reset" data-dark="../logo/home.svg" data-light="../logo/home-light.svg">
+          </button>
+        </div>
+        <div class="chart-wrap">
+          <svg id="chart-psnr" viewBox="0 0 540 360" aria-label="Size vs PSNR chart"></svg>
+          <div class="tooltip" id="tooltip-psnr"></div>
+          <div class="selection-rect" id="sel-psnr"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const methods = ['3DGS', '2DGS', 'EAGLES', 'GSCodec', 'LightGaussian', 'Scaffold-GS', 'CompGS', 'Ours'];
+    const sizes = [16.82, 8.288, 2.26, 2.34, 6.41, 8.46, 2.46, 2.15];
+    const points = [74730, 37459, 54949, 58755, 24979, 32300, 74730, 59837];
+    const psnrs = [40.88, 35.43, 33.67, 34.26, 35.00, 41.88, 35.53, 34.27];
+    const markers = ['circle', 'square', 'triangle-right', 'triangle-up', 'triangle-down', 'triangle-left', 'diamond', 'pentagon'];
+    const colors = [
+      [0.00, 0.45, 0.74],
+      [0.85, 0.33, 0.10],
+      [0.47, 0.67, 0.19],
+      [0.49, 0.18, 0.56],
+      [0.64, 0.08, 0.18],
+      [0.85, 0.65, 0.15],
+      [0.15, 0.60, 0.55],
+      [0.90, 0.10, 0.10]
+    ];
+
+    const markerSize = (method) => method === 'Ours' ? 16 : 10;
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function svgEl(tag, attrs = {}) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [key, value] of Object.entries(attrs)) {
+        el.setAttribute(key, value);
+      }
+      return el;
+    }
+
+    function formatNumber(value, digits = 2) {
+      return Number(value).toFixed(digits);
+    }
+
+    function formatPoints(value) {
+      return Math.round(value).toLocaleString('en-US');
+    }
+
+    function scaleLinear(domainMin, domainMax, rangeMin, rangeMax) {
+      const domainSpan = domainMax - domainMin;
+      const rangeSpan = rangeMax - rangeMin;
+      return (value) => rangeMin + ((value - domainMin) / domainSpan) * rangeSpan;
+    }
+
+    function markerPath(type, x, y, size) {
+      const half = size;
+      const top = y - half;
+      const bottom = y + half;
+      const left = x - half;
+      const right = x + half;
+      switch (type) {
+        case 'square':
+          return `M ${left} ${top} H ${right} V ${bottom} H ${left} Z`;
+        case 'triangle-up':
+          return `M ${x} ${top} L ${right} ${bottom} L ${left} ${bottom} Z`;
+        case 'triangle-down':
+          return `M ${left} ${top} L ${right} ${top} L ${x} ${bottom} Z`;
+        case 'triangle-left':
+          return `M ${left} ${y} L ${right} ${top} L ${right} ${bottom} Z`;
+        case 'triangle-right':
+          return `M ${left} ${top} L ${right} ${y} L ${left} ${bottom} Z`;
+        case 'diamond':
+          return `M ${x} ${top} L ${right} ${y} L ${x} ${bottom} L ${left} ${y} Z`;
+        case 'pentagon': {
+          const r = size;
+          const pts = [];
+          for (let i = 0; i < 5; i++) {
+            const angle = (-Math.PI / 2) + i * (2 * Math.PI / 5);
+            pts.push([x + r * Math.cos(angle), y + r * Math.sin(angle)]);
+          }
+          return `M ${pts.map((p) => `${p[0]} ${p[1]}`).join(' L ')} Z`;
+        }
+        default:
+          return `M ${x} ${y} m -${size}, 0 a ${size},${size} 0 1,0 ${size * 2},0 a ${size},${size} 0 1,0 -${size * 2},0`;
+      }
+    }
+
+    function drawAxes(parent, inner, config) {
+      const { left, top, width, height } = inner;
+      const xAxisY = top + height;
+
+      parent.appendChild(svgEl('line', { x1: left, y1: top, x2: left, y2: xAxisY, stroke: '#777', 'stroke-width': 1.2 }));
+      parent.appendChild(svgEl('line', { x1: left, y1: xAxisY, x2: left + width, y2: xAxisY, stroke: '#777', 'stroke-width': 1.2 }));
+
+      config.xTicks.forEach((tick) => {
+        const x = config.xScale(tick);
+        parent.appendChild(svgEl('line', { x1: x, y1: top, x2: x, y2: xAxisY, stroke: '#ececec', 'stroke-width': 1 }));
+        parent.appendChild(svgEl('line', { x1: x, y1: xAxisY, x2: x, y2: xAxisY + 5, stroke: '#777', 'stroke-width': 1 }));
+        const text = svgEl('text', { x, y: xAxisY + 20, 'text-anchor': 'middle', class: 'tick-label' });
+        text.textContent = config.formatXTick ? config.formatXTick(tick) : tick;
+        parent.appendChild(text);
+      });
+
+      config.yTicks.forEach((tick) => {
+        const y = config.yScale(tick);
+        parent.appendChild(svgEl('line', { x1: left, y1: y, x2: left + width, y2: y, stroke: '#ececec', 'stroke-width': 1 }));
+        parent.appendChild(svgEl('line', { x1: left - 5, y1: y, x2: left, y2: y, stroke: '#777', 'stroke-width': 1 }));
+        const text = svgEl('text', { x: left - 10, y: y + 4, 'text-anchor': 'end', class: 'tick-label' });
+        text.textContent = config.formatYTick ? config.formatYTick(tick) : tick;
+        parent.appendChild(text);
+      });
+
+      const xLabel = svgEl('text', {
+        x: left + width / 2,
+        y: xAxisY + 42,
+        'text-anchor': 'middle',
+        class: 'axis-label'
+      });
+      xLabel.textContent = config.xLabel;
+      parent.appendChild(xLabel);
+
+      const yLabel = svgEl('text', {
+        x: 20,
+        y: top + height / 2,
+        transform: `rotate(-90 20 ${top + height / 2})`,
+        'text-anchor': 'middle',
+        class: 'axis-label'
+      });
+      yLabel.textContent = config.yLabel;
+      parent.appendChild(yLabel);
+    }
+
+    // Legend will be drawn as SVG inside the chart to match ablation pages
+
+    function createLinearTicks(min, max, count) {
+      if (!Number.isFinite(min) || !Number.isFinite(max) || count < 2 || max <= min) {
+        return [min, max];
+      }
+      const step = (max - min) / (count - 1);
+      const ticks = [];
+      for (let i = 0; i < count; i++) {
+        ticks.push(min + i * step);
+      }
+      return ticks;
+    }
+
+    function formatTickAdaptive(value, span) {
+      if (!Number.isFinite(value)) return '';
+      const absSpan = Math.abs(span);
+      if (absSpan >= 20) return Math.round(value).toString();
+      if (absSpan >= 5) return (Math.round(value * 10) / 10).toString();
+      return (Math.round(value * 100) / 100).toString();
+    }
+
+    function renderChart(svgId, tooltipId, toolbarIds, data, config) {
+      const svg = document.getElementById(svgId);
+      const container = svg.parentElement;
+      const tooltip = document.getElementById(tooltipId);
+      const panBtn = document.getElementById(toolbarIds.pan);
+      const zoomBtn = document.getElementById(toolbarIds.zoom);
+      const homeBtn = document.getElementById(toolbarIds.home);
+      const box = svg.viewBox.baseVal;
+      const width = box.width;
+      const height = box.height;
+      const inner = { left: 72, top: 0, width: width - 118, height: height - 50 };
+      const clipId = `${svgId}-plot-clip`;
+
+      const defaultDomain = {
+        xMin: 0,
+        xMax: 18,
+        yMin: config.yMin,
+        yMax: config.yMax
+      };
+      const panBounds = {
+        xMin: defaultDomain.xMin - (defaultDomain.xMax - defaultDomain.xMin) * 0.2,
+        xMax: defaultDomain.xMax + (defaultDomain.xMax - defaultDomain.xMin) * 0.2,
+        yMin: defaultDomain.yMin - (defaultDomain.yMax - defaultDomain.yMin) * 0.2,
+        yMax: defaultDomain.yMax + (defaultDomain.yMax - defaultDomain.yMin) * 0.2
+      };
+      const domain = { ...defaultDomain };
+      const minSpanX = (defaultDomain.xMax - defaultDomain.xMin) / 80;
+      const minSpanY = (defaultDomain.yMax - defaultDomain.yMin) / 80;
+
+      const background = svgEl('rect', {
+        x: 0,
+        y: 0,
+        width,
+        height,
+        fill: '#ffffff',
+        rx: 12
+      });
+      svg.appendChild(background);
+
+      const viewport = svgEl('g', { id: svgId + '-viewport' });
+      svg.appendChild(viewport);
+
+      const defs = svgEl('defs');
+      const clipPath = svgEl('clipPath', { id: clipId });
+      clipPath.appendChild(svgEl('rect', {
+        x: inner.left,
+        y: inner.top,
+        width: inner.width,
+        height: inner.height
+      }));
+      defs.appendChild(clipPath);
+      svg.appendChild(defs);
+
+      // legend is drawn as SVG inside drawChart(); remove old DOM legend call
+
+      let xScale = null;
+      let yScale = null;
+      let invXScale = null;
+      let invYScale = null;
+
+      function clampDomain(domainMin, domainMax, globalMin, globalMax, minSpan) {
+        let min = domainMin;
+        let max = domainMax;
+        let span = max - min;
+        const globalSpan = globalMax - globalMin;
+        if (span < minSpan) {
+          const center = (min + max) / 2;
+          min = center - minSpan / 2;
+          max = center + minSpan / 2;
+          span = max - min;
+        }
+        if (span > globalSpan) {
+          min = globalMin;
+          max = globalMax;
+          span = globalSpan;
+        }
+        if (min < globalMin) {
+          max += (globalMin - min);
+          min = globalMin;
+        }
+        if (max > globalMax) {
+          min -= (max - globalMax);
+          max = globalMax;
+        }
+        min = Math.max(globalMin, min);
+        max = Math.min(globalMax, max);
+        return { min, max };
+      }
+
+      function clientToSvg(clientX, clientY) {
+        const pt = svg.createSVGPoint();
+        pt.x = clientX;
+        pt.y = clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+
+      function inPlotArea(pt) {
+        return pt.x >= inner.left && pt.x <= (inner.left + inner.width) && pt.y >= inner.top && pt.y <= (inner.top + inner.height);
+      }
+
+      function drawChart() {
+        while (viewport.firstChild) {
+          viewport.removeChild(viewport.firstChild);
+        }
+
+        xScale = scaleLinear(domain.xMin, domain.xMax, inner.left, inner.left + inner.width);
+        yScale = scaleLinear(domain.yMin, domain.yMax, inner.top + inner.height, inner.top);
+        invXScale = scaleLinear(inner.left, inner.left + inner.width, domain.xMin, domain.xMax);
+        invYScale = scaleLinear(inner.top + inner.height, inner.top, domain.yMin, domain.yMax);
+
+        const drawConfig = {
+          ...config,
+          xScale,
+          yScale,
+          xTicks: createLinearTicks(domain.xMin, domain.xMax, 10),
+          yTicks: createLinearTicks(domain.yMin, domain.yMax, 7),
+          formatXTick: config.formatXTickDynamic
+            ? config.formatXTickDynamic(domain)
+            : (tick) => formatTickAdaptive(tick, domain.xMax - domain.xMin),
+          formatYTick: config.formatYTickDynamic
+            ? config.formatYTickDynamic(domain)
+            : (tick) => formatTickAdaptive(tick, domain.yMax - domain.yMin)
+        };
+
+        drawAxes(viewport, inner, drawConfig);
+
+        const seriesGroup = svgEl('g', { 'clip-path': `url(#${clipId})` });
+        data.forEach((method, index) => {
+          const x = xScale(sizes[index]);
+          const y = yScale(method.value);
+          const color = `rgb(${colors[index].map((c) => Math.round(c * 255)).join(',')})`;
+          const marker = markerPath(markers[index], x, y, markerSize(methods[index]));
+          const shape = svgEl('path', {
+            d: marker,
+            fill: color,
+            stroke: color,
+            'stroke-width': 1.4,
+            'fill-opacity': 0.86,
+            cursor: 'pointer'
+          });
+
+          const hit = svgEl('circle', {
+            cx: x,
+            cy: y,
+            r: 18,
+            fill: 'transparent',
+            cursor: 'pointer'
+          });
+
+          const showTooltip = (event) => {
+            const localX = event.offsetX + 14;
+            const localY = event.offsetY + 14;
+            tooltip.innerHTML = `
+              <strong>${method.name}</strong>
+              Size: ${formatNumber(sizes[index])} MB<br>
+              ${config.tooltipLabel}: ${config.formatValue(method.value)}
+            `;
+            tooltip.style.left = `${clamp(localX, 8, svg.clientWidth - 170)}px`;
+            tooltip.style.top = `${clamp(localY, 8, svg.clientHeight - 90)}px`;
+            tooltip.style.opacity = '1';
+          };
+
+          const moveTooltip = (event) => {
+            const localX = event.offsetX + 14;
+            const localY = event.offsetY + 14;
+            tooltip.style.left = `${clamp(localX, 8, svg.clientWidth - 170)}px`;
+            tooltip.style.top = `${clamp(localY, 8, svg.clientHeight - 90)}px`;
+          };
+
+          const hideTooltip = () => {
+            tooltip.style.opacity = '0';
+          };
+
+          [shape, hit].forEach((node) => {
+            node.addEventListener('mouseenter', showTooltip);
+            node.addEventListener('mousemove', moveTooltip);
+            node.addEventListener('mouseleave', hideTooltip);
+          });
+
+          seriesGroup.appendChild(shape);
+          seriesGroup.appendChild(hit);
+        });
+
+        viewport.appendChild(seriesGroup);
+
+        // svg legend at right-bottom (match ablation style but keep inside plot)
+        const legendSvg = svgEl('g');
+        const itemH = 18;
+        const items = methods.map((label, index) => ({ label, color: `rgb(${colors[index].map((c) => Math.round(c * 255)).join(',')})` }));
+        const totalH = items.length * itemH;
+        let lx = inner.left + inner.width - 100; // legend left
+        let ly = inner.top + inner.height - totalH - 6;
+        if (ly < inner.top + 6) ly = inner.top + 6;
+        items.forEach((it, idx) => {
+          const rect = svgEl('rect', { x: lx, y: ly, width: 12, height: 8, fill: it.color });
+          legendSvg.appendChild(rect);
+          const t = svgEl('text', { x: lx + 18, y: ly + 8, class: 'legend-label' });
+          t.textContent = it.label;
+          legendSvg.appendChild(t);
+          ly += itemH;
+        });
+        viewport.appendChild(legendSvg);
+      }
+
+      function resetZoom() {
+        domain.xMin = defaultDomain.xMin;
+        domain.xMax = defaultDomain.xMax;
+        domain.yMin = defaultDomain.yMin;
+        domain.yMax = defaultDomain.yMax;
+        drawChart();
+      }
+
+      svg.addEventListener('wheel', (ev) => {
+        ev.preventDefault();
+        const p = clientToSvg(ev.clientX, ev.clientY);
+        if (!inPlotArea(p)) return;
+
+        const factor = Math.exp((-ev.deltaY) * 0.0012);
+        const px = (p.x - inner.left) / inner.width;
+        const py = (p.y - inner.top) / inner.height;
+
+        const spanX = domain.xMax - domain.xMin;
+        const spanY = domain.yMax - domain.yMin;
+        const newSpanX = spanX / factor;
+        const newSpanY = spanY / factor;
+
+        const anchorX = invXScale(p.x);
+        const anchorY = invYScale(p.y);
+
+        let newXMin = anchorX - px * newSpanX;
+        let newXMax = newXMin + newSpanX;
+        let newYMax = anchorY + py * newSpanY;
+        let newYMin = newYMax - newSpanY;
+
+        const clampedX = clampDomain(newXMin, newXMax, defaultDomain.xMin, defaultDomain.xMax, minSpanX);
+        const clampedY = clampDomain(newYMin, newYMax, defaultDomain.yMin, defaultDomain.yMax, minSpanY);
+
+        domain.xMin = clampedX.min;
+        domain.xMax = clampedX.max;
+        domain.yMin = clampedY.min;
+        domain.yMax = clampedY.max;
+        drawChart();
+      }, { passive: false });
+
+      svg.addEventListener('dblclick', (ev) => {
+        ev.preventDefault();
+        resetZoom();
+      });
+
+      const sel = container.querySelector('.selection-rect');
+      let selecting = false;
+      let panning = false;
+      let interactionMode = 'pan';
+      let startClient = null;
+      let lastPanPoint = null;
+
+      function setInteractionMode(mode) {
+        interactionMode = mode;
+        panBtn.classList.toggle('is-active', mode === 'pan');
+        zoomBtn.classList.toggle('is-active', mode === 'zoom');
+        container.classList.toggle('zoom-mode', mode === 'zoom');
+        updateToolbarImages();
+      }
+
+      function updateBtnImage(btn) {
+        const img = btn && btn.querySelector && btn.querySelector('.tool-img');
+        if (!img) return;
+        const dark = img.dataset.dark || img.src;
+        const light = img.dataset.light || dark;
+        img.src = btn.classList.contains('is-active') ? light : dark;
+      }
+
+      function updateToolbarImages() {
+        [panBtn, zoomBtn, homeBtn].forEach(updateBtnImage);
+      }
+
+      [panBtn, zoomBtn, homeBtn].forEach((btn) => {
+        const img = btn && btn.querySelector && btn.querySelector('.tool-img');
+        if (!img) return;
+        btn.addEventListener('mouseenter', () => { img.src = img.dataset.light || img.dataset.dark || img.src; });
+        btn.addEventListener('mouseleave', () => { img.src = btn.classList.contains('is-active') ? img.dataset.light || img.dataset.dark : img.dataset.dark || img.dataset.light; });
+      });
+
+      container.addEventListener('mousedown', (ev) => {
+        if (ev.button !== 0) return; // only left button
+        const startSvg = clientToSvg(ev.clientX, ev.clientY);
+        if (!inPlotArea(startSvg)) return;
+
+        if (interactionMode === 'zoom') {
+          selecting = true;
+          const rect = container.getBoundingClientRect();
+          startClient = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+          sel.style.left = `${startClient.x}px`;
+          sel.style.top = `${startClient.y}px`;
+          sel.style.width = '0px';
+          sel.style.height = '0px';
+          sel.style.display = 'block';
+          return;
+        }
+
+        panning = true;
+        lastPanPoint = startSvg;
+        container.classList.add('is-grabbing');
+        ev.preventDefault();
+      });
+
+      window.addEventListener('mousemove', (ev) => {
+        if (panning) {
+          const current = clientToSvg(ev.clientX, ev.clientY);
+          const shiftX = invXScale(lastPanPoint.x) - invXScale(current.x);
+          const shiftY = invYScale(lastPanPoint.y) - invYScale(current.y);
+
+          const clampedX = clampDomain(
+            domain.xMin + shiftX,
+            domain.xMax + shiftX,
+            panBounds.xMin,
+            panBounds.xMax,
+            minSpanX
+          );
+          const clampedY = clampDomain(
+            domain.yMin + shiftY,
+            domain.yMax + shiftY,
+            panBounds.yMin,
+            panBounds.yMax,
+            minSpanY
+          );
+
+          domain.xMin = clampedX.min;
+          domain.xMax = clampedX.max;
+          domain.yMin = clampedY.min;
+          domain.yMax = clampedY.max;
+          lastPanPoint = current;
+          drawChart();
+          return;
+        }
+
+        if (!selecting) return;
+        const rect = container.getBoundingClientRect();
+        const cur = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+        const x = Math.min(startClient.x, cur.x);
+        const y = Math.min(startClient.y, cur.y);
+        const w = Math.abs(cur.x - startClient.x);
+        const h = Math.abs(cur.y - startClient.y);
+        sel.style.left = `${x}px`;
+        sel.style.top = `${y}px`;
+        sel.style.width = `${w}px`;
+        sel.style.height = `${h}px`;
+      });
+
+      window.addEventListener('mouseup', (ev) => {
+        if (panning) {
+          panning = false;
+          container.classList.remove('is-grabbing');
+        }
+
+        if (!selecting) return;
+        selecting = false;
+
+        const rect = container.getBoundingClientRect();
+        const sx = parseFloat(sel.style.left || '0');
+        const sy = parseFloat(sel.style.top || '0');
+        const sw = parseFloat(sel.style.width || '0');
+        const sh = parseFloat(sel.style.height || '0');
+        sel.style.display = 'none';
+
+        if (sw < 8 || sh < 8) return;
+
+        const p1 = clientToSvg(rect.left + sx, rect.top + sy);
+        const p2 = clientToSvg(rect.left + sx + sw, rect.top + sy + sh);
+
+        const x1 = clamp(Math.min(p1.x, p2.x), inner.left, inner.left + inner.width);
+        const x2 = clamp(Math.max(p1.x, p2.x), inner.left, inner.left + inner.width);
+        const y1 = clamp(Math.min(p1.y, p2.y), inner.top, inner.top + inner.height);
+        const y2 = clamp(Math.max(p1.y, p2.y), inner.top, inner.top + inner.height);
+
+        if ((x2 - x1) < 2 || (y2 - y1) < 2) return;
+
+        let newXMin = invXScale(x1);
+        let newXMax = invXScale(x2);
+        let newYMax = invYScale(y1);
+        let newYMin = invYScale(y2);
+
+        const clampedX = clampDomain(newXMin, newXMax, defaultDomain.xMin, defaultDomain.xMax, minSpanX);
+        const clampedY = clampDomain(newYMin, newYMax, defaultDomain.yMin, defaultDomain.yMax, minSpanY);
+
+        domain.xMin = clampedX.min;
+        domain.xMax = clampedX.max;
+        domain.yMin = clampedY.min;
+        domain.yMax = clampedY.max;
+        drawChart();
+      });
+
+      drawChart();
+
+      panBtn.addEventListener('click', () => setInteractionMode('pan'));
+      zoomBtn.addEventListener('click', () => setInteractionMode('zoom'));
+      homeBtn.addEventListener('click', () => resetZoom());
+
+      setInteractionMode('pan');
+    }
+
+    const pointData = methods.map((name, index) => ({ name, value: points[index] }));
+    const psnrData = methods.map((name, index) => ({ name, value: psnrs[index] }));
+
+    renderChart('chart-points', 'tooltip-points', {
+      pan: 'tool-pan-points',
+      zoom: 'tool-zoom-points',
+      home: 'tool-home-points'
+    }, pointData, {
+      yLabel: 'Number of Points (*10^4)',
+      xLabel: 'Size (MB)',
+      tooltipLabel: 'Points',
+      xTicks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18],
+      yTicks: [20000, 30000, 40000, 50000, 60000, 70000, 80000],
+      yMin: 20000,
+      yMax: 80000,
+      formatXTick: (tick) => tick,
+      formatYTickDynamic: (domain) => {
+        const span = domain.yMax - domain.yMin;
+        return (tick) => {
+          const v = tick / 10000;
+          if (span >= 20000) {
+            return (Math.round(v * 10) / 10).toString();
+          }
+          if (span >= 5000) {
+            return (Math.round(v * 100) / 100).toString();
+          }
+          return (Math.round(v * 1000) / 1000).toString();
+        };
+      },
+      formatValue: formatPoints
+    });
+
+    renderChart('chart-psnr', 'tooltip-psnr', {
+      pan: 'tool-pan-psnr',
+      zoom: 'tool-zoom-psnr',
+      home: 'tool-home-psnr'
+    }, psnrData, {
+      yLabel: 'PSNR (dB)',
+      xLabel: 'Size (MB)',
+      tooltipLabel: 'PSNR',
+      xTicks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18],
+      yTicks: [32.5, 34, 35.5, 37, 38.5, 40, 41.5],
+      yMin: 32.5,
+      yMax: 42.5,
+      formatXTick: (tick) => tick,
+      formatYTick: (tick) => tick.toFixed(1),
+      formatValue: (value) => `${formatNumber(value)} dB`
+    });
+  </script>
+</body>
+</html>

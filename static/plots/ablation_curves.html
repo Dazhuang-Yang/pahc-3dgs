@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ablation Curves</title>
+  <link rel="stylesheet" href="../css/plots.css">
+  <style>
+    .small-figure { padding: 12px; }
+    .chart-caption { text-align: center; margin-top: 8px; font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="figure small-figure">
+    <div class="title">Structural Efficiency and Rate-Distortion Comparison</div>
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-title">Codebook Ablation (CR vs PSNR)</div>
+        <div class="interaction-toolbar" aria-label="Interaction toolbar for codebook chart">
+          <button class="tool-btn is-active" id="tool-pan-codebook" type="button" aria-label="Pan mode" title="Pan">
+            <img class="tool-img" src="../logo/move.svg" alt="Pan" data-dark="../logo/move.svg" data-light="../logo/move-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-zoom-codebook" type="button" aria-label="Zoom selection mode" title="Zoom selection">
+            <img class="tool-img" src="../logo/zoom-out.svg" alt="Zoom" data-dark="../logo/zoom-out.svg" data-light="../logo/zoom-out-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-home-codebook" type="button" aria-label="Reset view" title="Reset view">
+            <img class="tool-img" src="../logo/home.svg" alt="Reset" data-dark="../logo/home.svg" data-light="../logo/home-light.svg">
+          </button>
+        </div>
+        <div class="chart-wrap">
+          <svg id="codebook-chart" viewBox="0 0 560 360" aria-label="Codebook ablation"></svg>
+          <div class="tooltip" id="codebook-tooltip"></div>
+          <div class="selection-rect" id="sel-codebook"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Threshold Ablation (CR vs PSNR)</div>
+        <div class="interaction-toolbar" aria-label="Interaction toolbar for thresh chart">
+          <button class="tool-btn is-active" id="tool-pan-thresh" type="button" aria-label="Pan mode" title="Pan">
+            <img class="tool-img" src="../logo/move.svg" alt="Pan" data-dark="../logo/move.svg" data-light="../logo/move-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-zoom-thresh" type="button" aria-label="Zoom selection mode" title="Zoom selection">
+            <img class="tool-img" src="../logo/zoom-out.svg" alt="Zoom" data-dark="../logo/zoom-out.svg" data-light="../logo/zoom-out-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-home-thresh" type="button" aria-label="Reset view" title="Reset view">
+            <img class="tool-img" src="../logo/home.svg" alt="Reset" data-dark="../logo/home.svg" data-light="../logo/home-light.svg">
+          </button>
+        </div>
+        <div class="chart-wrap">
+          <svg id="thresh-chart" viewBox="0 0 560 360" aria-label="Threshold ablation"></svg>
+          <div class="tooltip" id="thresh-tooltip"></div>
+          <div class="selection-rect" id="sel-thresh"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-caption">Left: results from <em>plot_ablation_codebook.m</em>; Right: results from <em>THRESH.m</em>.</div>
+  </div>
+
+  <script>
+    // Data ported directly from the MATLAB scripts
+    const codebookData = {
+      cr: {
+        SS1A_Real: [10.14, 9.48, 8.39, 6.82, 4.97],
+        SS1A_Virtual: [11.50, 10.77, 9.80, 8.44, 6.50],
+        Proba2: [13.93, 12.21, 8.94, 5.81, 3.38],
+        VenusExpress: [13.73, 11.33, 9.30, 7.81, 5.70],
+        Acrimsat: [11.52, 10.67, 9.31, 7.40, 5.34]
+      },
+      psnr: {
+        SS1A_Real: [34.2148, 34.4934, 35.8133, 37.2212, 38.0036],
+        SS1A_Virtual: [31.5549, 32.9597, 34.0935, 33.9100, 34.0867],
+        Proba2: [28.7721, 28.5989, 29.1826, 34.9500, 36.0542],
+        VenusExpress: [26.9562, 27.6435, 28.9523, 30.8000, 31.1720],
+        Acrimsat: [32.6506, 33.7051, 34.3619, 36.7767, 37.8317]
+      }
+    };
+
+    const threshData = {
+      Acrimsat: { cr: [6.63, 7.40, 7.84, 8.76, 9.98], psnr: [41.5199, 36.7767, 32.1826, 31.5537, 26.6007] },
+      Proba2:   { cr: [5.25, 5.81, 5.83, 5.83, 5.83], psnr: [36.3312, 34.95, 30.8047, 30.4836, 30.7302] },
+      SS1A_Virtual: { cr: [8.01, 8.44, 9.33, 9.62, 9.71], psnr: [35.8448, 33.91, 29.2386, 26.8140, 26.2718] },
+      VenusExpress: { cr: [7.25, 7.81, 8.21, 9.40, 9.68], psnr: [31.6816, 30.8, 29.5542, 28.0708, 26.8478] },
+      SS1A_Real: { cr: [6.72, 6.82, 7.11, 7.11, 7.11], psnr: [37.4680, 37.2212, 35.6331, 36.0255, 35.7580] }
+    };
+
+    const seriesOrder = ['SS1A_Real','SS1A_Virtual','Proba2','VenusExpress','Acrimsat'];
+    const seriesNames = {
+      SS1A_Real: 'SS-1A (Real)', SS1A_Virtual: 'SS-1A (Virtual)', Proba2: 'Proba-2', VenusExpress: 'Venus Express', Acrimsat: 'Acrimsat'
+    };
+
+    const colors = [ 'rgb(0,114,189)', 'rgb(217,83,25)', 'rgb(126,47,142)', 'rgb(237,177,32)', 'rgb(119,172,48)' ];
+
+    function svgEl(tag, attrs={}){ const el = document.createElementNS('http://www.w3.org/2000/svg', tag); for(const k in attrs) el.setAttribute(k, attrs[k]); return el; }
+    function scaleLinear(d0,d1,r0,r1){ const span = d1 - d0 || 1; return v => r0 + ((v - d0) / span) * (r1 - r0); }
+    function niceTicks(min,max,count){ const span = max-min; const step = span/(count-1); const ticks = []; for(let i=0;i<count;i++) ticks.push(Math.round((min + i*step)*100)/100); return ticks; }
+    function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+
+    function drawPanel(svgId, tooltipId, dataSets, xlim, ylim){
+      const svg = document.getElementById(svgId); const tooltip = document.getElementById(tooltipId);
+      const vb = svg.viewBox.baseVal; const W = vb.width, H = vb.height;
+      const margin = {left:72, right:20, top:18, bottom:72}; const inner = {left:margin.left, top:margin.top, width: W - margin.left - margin.right, height: H - margin.top - margin.bottom};
+      while(svg.firstChild) svg.removeChild(svg.firstChild);
+      const g = svgEl('g'); svg.appendChild(g);
+
+      // domain and interaction state (will be used by interactive redraw)
+      const defaultDomain = { xMin: xlim[0], xMax: xlim[1], yMin: ylim[0], yMax: ylim[1] };
+      const domain = { ...defaultDomain };
+      const panBounds = {
+        xMin: defaultDomain.xMin - (defaultDomain.xMax - defaultDomain.xMin) * 0.2,
+        xMax: defaultDomain.xMax + (defaultDomain.xMax - defaultDomain.xMin) * 0.2,
+        yMin: defaultDomain.yMin - (defaultDomain.yMax - defaultDomain.yMin) * 0.2,
+        yMax: defaultDomain.yMax + (defaultDomain.yMax - defaultDomain.yMin) * 0.2
+      };
+      const minSpanX = (defaultDomain.xMax - defaultDomain.xMin) / 80;
+      const minSpanY = (defaultDomain.yMax - defaultDomain.yMin) / 80;
+
+      let xScale = null;
+      let yScale = null;
+      let invXScale = null;
+      let invYScale = null;
+
+      // draw function that uses current domain
+      function drawChart() {
+        while (g.firstChild) g.removeChild(g.firstChild);
+        xScale = scaleLinear(domain.xMin, domain.xMax, inner.left, inner.left + inner.width);
+        yScale = scaleLinear(domain.yMin, domain.yMax, inner.top + inner.height, inner.top);
+        invXScale = scaleLinear(inner.left, inner.left + inner.width, domain.xMin, domain.xMax);
+        invYScale = scaleLinear(inner.top + inner.height, inner.top, domain.yMin, domain.yMax);
+
+        // grid & axes
+        const grid = svgEl('g');
+        const xTicks = niceTicks(domain.xMin, domain.xMax, 6);
+        const yTicks = niceTicks(domain.yMin, domain.yMax, 6);
+        xTicks.forEach(t=>{ const x = xScale(t); grid.appendChild(svgEl('line',{x1:x,y1:inner.top,x2:x,y2:inner.top+inner.height,stroke:'#eee','stroke-width':1})); const tx = svgEl('text',{x:x,y:inner.top+inner.height+22,'text-anchor':'middle',class:'tick-label'}); tx.textContent = t; grid.appendChild(tx); });
+        yTicks.forEach(t=>{ const y = yScale(t); grid.appendChild(svgEl('line',{x1:inner.left,y1:y,x2:inner.left+inner.width,y2:y,stroke:'#eee','stroke-width':1})); const lbl = svgEl('text',{x:inner.left-10,y:y+4,'text-anchor':'end',class:'tick-label'}); const formattedY = (svgId === 'codebook-chart' && Math.abs(t - Math.round(t)) > 1e-8) ? t.toFixed(1) : t; lbl.textContent = formattedY; grid.appendChild(lbl); });
+        g.appendChild(grid);
+
+        g.appendChild(svgEl('line',{x1:inner.left,y1:inner.top,x2:inner.left,y2:inner.top+inner.height,stroke:'#777','stroke-width':1.2}));
+        g.appendChild(svgEl('line',{x1:inner.left,y1:inner.top+inner.height,x2:inner.left+inner.width,y2:inner.top+inner.height,stroke:'#777','stroke-width':1.2}));
+
+        // axis labels
+        const xl = svgEl('text',{x:inner.left+inner.width/2,y:inner.top+inner.height+46,'text-anchor':'middle',class:'axis-label'}); xl.textContent = 'Storage Compression Ratio (CR$_s \\times$)'; g.appendChild(xl);
+        const yl = svgEl('text',{x:16,y:inner.top+inner.height/2,transform:`rotate(-90 16 ${inner.top+inner.height/2})`,'text-anchor':'middle',class:'axis-label'}); yl.textContent = 'Quantized PSNR (dB)'; g.appendChild(yl);
+
+        // draw series
+        const seriesGroup = svgEl('g', {'clip-path': `url(#${svgId}-clip)`});
+        seriesOrder.forEach((key, idx)=>{
+          let pts = [];
+          if(dataSets && dataSets.cr && dataSets.psnr && Array.isArray(dataSets.cr[key]) ){
+            const xs = dataSets.cr[key]; const ys = dataSets.psnr[key]; pts = xs.map((c,i)=>({x:c, y: ys[i]}));
+          } else if(dataSets && dataSets[key] && Array.isArray(dataSets[key].cr)){
+            const xs = dataSets[key].cr; const ys = dataSets[key].psnr; pts = xs.map((c,i)=>({x:c, y: ys[i]}));
+          } else return;
+
+          const line = pts.map((p,i)=> (i===0?`M ${xScale(p.x)} ${yScale(p.y)}`:`L ${xScale(p.x)} ${yScale(p.y)}`)).join(' ');
+          seriesGroup.appendChild(svgEl('path',{d:line,stroke:colors[idx],fill:'none','stroke-width':1.6,'stroke-linejoin':'round'}));
+          pts.forEach((p,i)=>{ const cx = xScale(p.x), cy = yScale(p.y); const circle = svgEl('circle',{cx,cy,r:6,fill:colors[idx],opacity:0.9});
+            circle.addEventListener('mouseenter', (ev)=>{ tooltip.style.left = (ev.offsetX+12)+'px'; tooltip.style.top = (ev.offsetY+12)+'px'; tooltip.style.opacity='1'; tooltip.innerHTML = `<strong>${seriesNames[key]}</strong><br>CR: ${p.x}<br>PSNR: ${p.y.toFixed(2)} dB`; });
+            circle.addEventListener('mouseleave', ()=>{ tooltip.style.opacity='0'; }); seriesGroup.appendChild(circle);
+          });
+        });
+
+        g.appendChild(seriesGroup);
+
+        // legend (position at left-bottom inside plot)
+        const legend = svgEl('g');
+        const lx = inner.left + 6;
+        const itemHeight = 18;
+        const totalH = seriesOrder.length * itemHeight;
+        let ly = inner.top + inner.height - totalH - 6;
+        if (ly < inner.top + 6) ly = inner.top + 6;
+        seriesOrder.forEach((key, idx)=>{
+          const rect = svgEl('rect',{x:lx,y:ly,width:12,height:8,fill:colors[idx]});
+          legend.appendChild(rect);
+          const t = svgEl('text',{x:lx+18,y:ly+8,class:'legend-label'});
+          t.textContent = seriesNames[key];
+          legend.appendChild(t);
+          ly += itemHeight;
+        });
+        g.appendChild(legend);
+      }
+
+      // setup clipping defs
+      const defs = svgEl('defs');
+      const clipPath = svgEl('clipPath',{id: `${svgId}-clip`});
+      clipPath.appendChild(svgEl('rect',{x: inner.left, y: inner.top, width: inner.width, height: inner.height}));
+      defs.appendChild(clipPath); svg.appendChild(defs);
+
+      // interaction helpers from size_psnr_num
+      function clampDomain(domainMin, domainMax, globalMin, globalMax, minSpan) {
+        let min = domainMin; let max = domainMax; let span = max - min; const globalSpan = globalMax - globalMin;
+        if (span < minSpan) {
+          const center = (min + max) / 2;
+          min = center - minSpan / 2; max = center + minSpan / 2; span = max - min;
+        }
+        if (span > globalSpan) { min = globalMin; max = globalMax; span = globalSpan; }
+        if (min < globalMin) { max += (globalMin - min); min = globalMin; }
+        if (max > globalMax) { min -= (max - globalMax); max = globalMax; }
+        min = Math.max(globalMin, min); max = Math.min(globalMax, max);
+        return { min, max };
+      }
+
+      function clientToSvg(clientX, clientY) { const pt = svg.createSVGPoint(); pt.x = clientX; pt.y = clientY; return pt.matrixTransform(svg.getScreenCTM().inverse()); }
+      function inPlotArea(pt) { return pt.x >= inner.left && pt.x <= (inner.left + inner.width) && pt.y >= inner.top && pt.y <= (inner.top + inner.height); }
+
+      function resetZoom() { domain.xMin = defaultDomain.xMin; domain.xMax = defaultDomain.xMax; domain.yMin = defaultDomain.yMin; domain.yMax = defaultDomain.yMax; drawChart(); }
+
+      // attach interactions
+      const base = svgId.replace('-chart','');
+      const panBtn = document.getElementById('tool-pan-' + base);
+      const zoomBtn = document.getElementById('tool-zoom-' + base);
+      const homeBtn = document.getElementById('tool-home-' + base);
+
+      svg.addEventListener('wheel', (ev) => {
+        ev.preventDefault(); const p = clientToSvg(ev.clientX, ev.clientY); if (!inPlotArea(p)) return;
+        const factor = Math.exp((-ev.deltaY) * 0.0012); const px = (p.x - inner.left) / inner.width; const py = (p.y - inner.top) / inner.height;
+        const spanX = domain.xMax - domain.xMin; const spanY = domain.yMax - domain.yMin; const newSpanX = spanX / factor; const newSpanY = spanY / factor;
+        const anchorX = invXScale(p.x); const anchorY = invYScale(p.y);
+        let newXMin = anchorX - px * newSpanX; let newXMax = newXMin + newSpanX; let newYMax = anchorY + py * newSpanY; let newYMin = newYMax - newSpanY;
+        const clampedX = clampDomain(newXMin, newXMax, defaultDomain.xMin, defaultDomain.xMax, minSpanX);
+        const clampedY = clampDomain(newYMin, newYMax, defaultDomain.yMin, defaultDomain.yMax, minSpanY);
+        domain.xMin = clampedX.min; domain.xMax = clampedX.max; domain.yMin = clampedY.min; domain.yMax = clampedY.max; drawChart();
+      }, { passive: false });
+
+      svg.addEventListener('dblclick', (ev)=>{ ev.preventDefault(); resetZoom(); });
+
+      const sel = svg.parentElement.querySelector('.selection-rect');
+      let selecting = false; let panning = false; let interactionMode = 'pan'; let startClient = null; let lastPanPoint = null;
+
+      function setInteractionMode(mode) {
+        interactionMode = mode;
+        if (panBtn) panBtn.classList.toggle('is-active', mode === 'pan');
+        if (zoomBtn) zoomBtn.classList.toggle('is-active', mode === 'zoom');
+        updateToolbarImages();
+      }
+
+      function updateBtnImage(btn) { const img = btn && btn.querySelector && btn.querySelector('.tool-img'); if (!img) return; const dark = img.dataset.dark || img.src; const light = img.dataset.light || dark; img.src = btn.classList.contains('is-active') ? light : dark; }
+      function updateToolbarImages() { [panBtn, zoomBtn, homeBtn].forEach(updateBtnImage); }
+
+      [panBtn, zoomBtn, homeBtn].forEach((btn)=>{ if(!btn) return; const img = btn.querySelector('.tool-img'); btn.addEventListener('mouseenter', ()=>{ img.src = img.dataset.light || img.dataset.dark || img.src; }); btn.addEventListener('mouseleave', ()=>{ img.src = btn.classList.contains('is-active') ? img.dataset.light || img.dataset.dark : img.dataset.dark || img.dataset.light; }); });
+
+      svg.parentElement.addEventListener('mousedown', (ev)=>{
+        if (ev.button !== 0) return; const startSvg = clientToSvg(ev.clientX, ev.clientY); if (!inPlotArea(startSvg)) return;
+        if (interactionMode === 'zoom') { selecting = true; const rect = svg.parentElement.getBoundingClientRect(); startClient = { x: ev.clientX - rect.left, y: ev.clientY - rect.top }; sel.style.left = `${startClient.x}px`; sel.style.top = `${startClient.y}px`; sel.style.width='0px'; sel.style.height='0px'; sel.style.display='block'; return; }
+        panning = true; lastPanPoint = startSvg; svg.parentElement.classList.add('is-grabbing'); ev.preventDefault();
+      });
+
+      window.addEventListener('mousemove', (ev)=>{
+        if (panning) { const current = clientToSvg(ev.clientX, ev.clientY); const shiftX = invXScale(lastPanPoint.x) - invXScale(current.x); const shiftY = invYScale(lastPanPoint.y) - invYScale(current.y);
+          const clampedX = clampDomain(domain.xMin + shiftX, domain.xMax + shiftX, panBounds.xMin, panBounds.xMax, minSpanX);
+          const clampedY = clampDomain(domain.yMin + shiftY, domain.yMax + shiftY, panBounds.yMin, panBounds.yMax, minSpanY);
+          domain.xMin = clampedX.min; domain.xMax = clampedX.max; domain.yMin = clampedY.min; domain.yMax = clampedY.max; lastPanPoint = current; drawChart(); return; }
+        if (!selecting) return; const rect = svg.parentElement.getBoundingClientRect(); const cur = { x: ev.clientX - rect.left, y: ev.clientY - rect.top }; const x = Math.min(startClient.x, cur.x); const y = Math.min(startClient.y, cur.y); const w = Math.abs(cur.x - startClient.x); const h = Math.abs(cur.y - startClient.y); sel.style.left = `${x}px`; sel.style.top = `${y}px`; sel.style.width = `${w}px`; sel.style.height = `${h}px`;
+      });
+
+      window.addEventListener('mouseup', (ev)=>{
+        if (panning) { panning=false; svg.parentElement.classList.remove('is-grabbing'); }
+        if (!selecting) return; selecting=false; const rect = svg.parentElement.getBoundingClientRect(); const sx = parseFloat(sel.style.left||'0'); const sy = parseFloat(sel.style.top||'0'); const sw = parseFloat(sel.style.width||'0'); const sh = parseFloat(sel.style.height||'0'); sel.style.display='none'; if (sw<8 || sh<8) return; const p1 = clientToSvg(rect.left + sx, rect.top + sy); const p2 = clientToSvg(rect.left + sx + sw, rect.top + sy + sh); const x1 = clamp(Math.min(p1.x,p2.x), inner.left, inner.left+inner.width); const x2 = clamp(Math.max(p1.x,p2.x), inner.left, inner.left+inner.width); const y1 = clamp(Math.min(p1.y,p2.y), inner.top, inner.top+inner.height); const y2 = clamp(Math.max(p1.y,p2.y), inner.top, inner.top+inner.height); if ((x2-x1)<2 || (y2-y1)<2) return; let newXMin = invXScale(x1); let newXMax = invXScale(x2); let newYMax = invYScale(y1); let newYMin = invYScale(y2); const clampedX = clampDomain(newXMin,newXMax,defaultDomain.xMin,defaultDomain.xMax,minSpanX); const clampedY = clampDomain(newYMin,newYMax,defaultDomain.yMin,defaultDomain.yMax,minSpanY); domain.xMin = clampedX.min; domain.xMax = clampedX.max; domain.yMin = clampedY.min; domain.yMax = clampedY.max; drawChart();
+      });
+
+      // wire toolbar buttons
+      if (panBtn) panBtn.addEventListener('click', ()=>{ setInteractionMode('pan'); updateToolbarImages(); });
+      if (zoomBtn) zoomBtn.addEventListener('click', ()=>{ setInteractionMode('zoom'); updateToolbarImages(); });
+      if (homeBtn) homeBtn.addEventListener('click', ()=>{ resetZoom(); updateToolbarImages(); });
+
+      // initial draw
+      drawChart();
+      setInteractionMode('pan');
+
+      return { svg, g, inner, xScale, yScale };
+    }
+
+    // Render left (codebook)
+    drawPanel('codebook-chart','codebook-tooltip', codebookData, [3.0,14.5], [25.4,39]);
+
+    // Render right (threshold) — THRESH.m had tighter x/y limits
+    // For threshData we use stored objects with cr/psnr per series key
+    const threshNormalized = {};
+    ['SS1A_Real','SS1A_Virtual','Proba2','VenusExpress','Acrimsat'].forEach(k=>{
+      threshNormalized[k] = threshData[k] || null;
+    });
+    drawPanel('thresh-chart','thresh-tooltip', threshNormalized, [4.5,10.5], [24,43]);
+  </script>
+</body>
+</html>
