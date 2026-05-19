@@ -1,44 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description"
-        content="Deformable Neural Radiance Fields creates free-viewpoint portraits (nerfies) from casually captured videos.">
-  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
+  <meta name="description" content="Physics-aware hierarchical 3DGS compression for aerospace objects and on-orbit servicing.">
+  <meta name="keywords" content="3DGS, compression, aerospace, satellite, on-orbit servicing">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NeRF-based Simultaneous Pose Estimation and 3D Reconstruction for Non-Cooperative Space Target</title>
+  <title>Physics-Aware Hierarchical 3DGS Compression</title>
 
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag('config', 'G-PYVRSFMDRL');
-  </script>
-
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-        rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/logo.png">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
+  <script defer src="./static/js/index.js"></script>
 </head>
 <body>
 
@@ -52,263 +27,264 @@
   </div>
   <div class="navbar-menu">
     <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-      <a class="navbar-item"> <!---to do: here can add my resume--->
-      <span class="icon">
-          <i class="fas fa-home"></i>
-      </span>
+      <a class="navbar-item" href="#top">
+        <span class="icon"><i class="fas fa-home"></i></span>
       </a>
-
       <div class="navbar-item has-dropdown is-hoverable">
         <a class="navbar-link">
           More Research
         </a>
         <div class="navbar-dropdown">
           <a class="navbar-item" href="https://ieeexplore.ieee.org/document/9327292">
-            Tiltable Quadrotor
+            Control System Design for Tiltable Quad-rotor with Propeller Failure
+          </a>
+          <a class="navbar-item" href="https://dazhuang-yang.github.io/">
+            NeRF-based Simultaneous Pose Estimation and 3D Reconstruction for Non-Cooperative Space Target
           </a>
         </div>
       </div>
+      <a class="navbar-item" href="#abstract">Abstract</a>
+      <a class="navbar-item" href="#method">Method</a>
+      <a class="navbar-item" href="#dataset">Dataset</a>
+      <a class="navbar-item" href="#results">Results</a>
+      <a class="navbar-item" href="#bibtex">BibTeX</a>  
     </div>
   </div>
 </nav>
 
-
-<section class="hero">
+<section class="hero publication-header" id="top">
   <div class="hero-body">
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">NeRF-based Simultaneous Pose Estimation and 3D Reconstruction for Non-Cooperative Space Target</h1>
+          <h1 class="title is-1 publication-title">Physics-Aware Hierarchical 3DGS Compression: An Efficient Representation for Aerospace Objects</h1>
+
           <div class="is-size-5 publication-authors">
-            <span class="author-block">
-              <a href="https://www.researchgate.net/profile/Dazhuang-Yang">Dazhuang Yang<sup>1</sup></a>,</span>
-            <span class="author-block">
-              <a>Yizhai Zhang<sup>1</sup></a>,</span>
-            <span class="author-block">
-              <a>Ge Yu<sup>2</sup></a>,</span>
-            <span class="author-block">
-              <a>Jiafu Jiao<sup>1</sup></a>,</span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?hl=en&user=-eey0pkAAAAJ">Binglu Wang<sup>1</sup></a>,</span>
-            <span class="author-block">
-              <a href="https://www.researchgate.net/profile/Panfeng-Huang">Panfeng Huang<sup>1</sup></a></span>
+            <span class="author-block">Dazhuang Yang<sup>1</sup>,</span>
+            <span class="author-block">Tao Zhao<sup>1</sup>,</span>
+            <span class="author-block">Yizhai Zhang<sup>1</sup>,</span>
+            <span class="author-block">Ganghui Shen<sup>1</sup>,</span>
+            <span class="author-block">Guotao Fang<sup>1</sup>,</span>
+            <span class="author-block">Panfeng Huang<sup>1</sup>,</span>
+            <span class="author-block">Binglu Wang<sup>1</sup></span>
+          </div>
+
+          <div class="is-size-6 publication-authors mt-2">
+            <span class="author-block">1. Northwestern Polytechnical University, Xi'an, China</span>
+          </div>
+
+          <div class="publication-links">
+            <span class="link-block">
+              <a href="./static/papers/gs-zip.pdf" class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                <span>Paper</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="https://github.com/Dazhuang-Yang/pahc-3dgs" class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><i class="fab fa-github"></i></span>
+                <span>Code</span>
+              </a>
             </span>
           </div>
 
-          <div class="is-size-5 publication-authors">
-            <span class="author-block">1. Northwestern Polytechnical University, Xi'an, China</span>
-            <span class="author-block">2. Shanghai Aerospace System Engineering, Shanghai, China</span>
-          </div>
-
-          <div class="column has-text-centered">
-            <div class="publication-links">
-              <!-- PDF Link. -->
-                <span class="link-block">
-                <a class="external-link button is-normal is-rounded is-dark" onclick="alert('The paper link will be provided after publication.')">
-                  <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
-                  </span>
-                  <span>Paper</span>
-                </a>
-              </span>
-              <!-- Code Link. -->
-              <span class="link-block">
-                <a href="https://github.com/DazhuangYang/nspar-ncst"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-github"></i>
-                  </span>
-                  <span>Code</span>
-                  </a>
-              </span>
-              <!-- Dataset Link. -->
-              <span class="link-block"> 
-                <!-- href="" -->
-                <a href="https://drive.google.com/drive/folders/1w16AACVh-1RRXbIkOZE7XNZL1KqBN9GN?usp=drive_link"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                    <i class="fas fa-database"></i>
-                  </span>
-                  <span>Dataset</span>
-                </a>
-              </span>
-              <span class="link-block"> 
-                <!-- href="" -->
-                <a href="https://github.com/DazhuangYang/SPARD"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <img src="./static/images/unreal.svg" style="width: 2em; height: 2em;" alt="Unreal Engine">
-                  </span>
-                  <span>UE project</span>
-                </a>
-              </span>
+          <div class="columns is-centered metric-row mt-5">
+            <div class="column is-one-third">
+              <div class="metric-box">
+                <div class="metric-value">8&times;</div>
+                <div class="metric-label">storage compression</div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="metric-box">
+                <div class="metric-value">~2 MB</div>
+                <div class="metric-label">compact payload</div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="metric-box">
+                <div class="metric-value">&gt;30 dB</div>
+                <div class="metric-label">high-fidelity rendering</div>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section", style="background-color: rgba(213, 213, 213, 0.225);">
+<section class="section" id="abstract">
   <div class="container is-max-desktop">
-    <!-- Abstract. -->
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
-          <p aria-hidden="true">
-            Accurate pose estimation and 3D reconstruction of Non-Cooperative Space Targets (NCSTs) are critical for proximity operations in active debris removal and on-orbit servicing. In this paper, we propose a novel NeRF-based Simultaneous Pose Estimation and 3D Reconstruction (SPAR) framework to address the challenges of efficiency and reliability in traditional point-based methods, which contains three key components, \ie a multi-resolution hash encoder to reduce computational cost, a 2D keyframe feature enhancement to guide view generalization, and a direct photometric constraint to stabilize pose estimation. Furthermore, the proposed framework is evaluated on a newly constructed Spacecraft Pose Estimation and 3D Reconstruction Dataset (SPARD), comprising both synthetic and real RGB-D images and the experimental results demonstrate its effectiveness. Our framework achieves real-time processing at 51 Hz with a pose estimation accuracy of 1.26 cm translation error and 0.97° rotation error. The results show improvements over traditional and NeRF-based baselines, validating its applicability to space missions with NCST.
+          <p>
+            While 3D Gaussian Splatting (3DGS) has revolutionized real-time rendering with high visual fidelity, its unstructured and discrete nature poses significant challenges for efficient storage and transmission, especially in bandwidth-constrained space-ground communications. Existing compression paradigms rely on signal redundancy, often leading to geometric collapse on complex structures at extreme bitrates.
+          </p>
+          <p>
+            We propose a physics-aware hierarchical 3DGS compression framework tailored for aerospace objects. The method reconfigures compression from pixel-level entropy coding to semantic-oriented component reorganization. A geometry layer condenses repetitive structures into compact meta-templates through spectral divergence pruning, rigid alignment, and differentiable refinement, while an appearance layer exploits material sparsity via component-wise manifold vector quantization. Experiments on SPARD show strong rate-distortion performance and a compact representation suitable for on-orbit servicing.
           </p>
         </div>
       </div>
     </div>
-    <!--/ Abstract. -->
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="method">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
-        <h2 class="title is-3">Pipeline</h2>
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3">Method Overview</h2>
+      </div>
     </div>
-    <div class="column">
-      <div class="columns">
-        <div class="column", style="text-align: center;">
-          <img src="./static/images/pipeline.svg" alt="Pipeline Image", style="height: auto; width: 90%;">
+
+    <div class="columns is-centered is-variable is-5">
+      <div class="column is-half">
+        <div class="figure-card">
+          <img src="./static/images/system.svg" alt="Space-ground computation architecture">
+          <p class="figure-caption">Integrated space-ground computation architecture for on-orbit servicing.</p>
         </div>
       </div>
+      <div class="column is-half">
+        <div class="figure-card">
+          <img src="./static/images/task.svg" alt="Physics-aware semantic decomposition">
+          <p class="figure-caption">Physics-aware decomposition of the Gaussian field into structured components.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="figure-card mt-5">
+      <img src="./static/images/pipeline.svg" alt="Overall pipeline">
+      <p class="figure-caption">Overall pipeline: semantic decomposition, hierarchical compression, and on-orbit assembly.</p>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="dataset">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
-        <h2 class="title is-3" style="text-align: center;">Spacecraft Pose Estimation and 3D Reconstruction Dataset <br>(SPARD)</h2>
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3">SPARD Dataset</h2>
+      </div>
     </div>
-    <div class="column">
-      <div class="columns">
-        <div class="column">
-          <h3 class="title is-4" style="text-align: center;">Synthetic Scene Setup</h3>
-          <div class="c">
-            <input type="radio" name="a1" id="cr-1" checked>
-            <label for="cr-1" style="--hue:130"></label>
-            <div class="ci" style="--z: 4">
-              <img src="./static/images/synthetic.svg" alt="Synthetic Scene" style="height: 250px; width: auto;">
-            </div>
 
-            <input type="radio" name="a1" id="cr-2">
-            <label for="cr-2" style="--hue: 0"></label>
-            <div class="ci" style="--z: 3">
-              <video id="dollyzoom" autoplay controls muted loop playsinline height=250>
-                <source src="./static/videos/synthetic.mp4"
-                        type="video/mp4">
-              </video>
-            </div>
-          </div>
+    <div class="columns is-centered is-variable is-5">
+      <div class="column is-half">
+        <div class="figure-card">
+          <img src="./static/images/synthetic.svg" alt="Synthetic scene setup">
+          <p class="figure-caption">Synthetic renderings generated with UE5.</p>
         </div>
-        <div class="column">
-          <h3 class="title is-4",  style="text-align: center;">Real Scene Setup</h3>
-          <div class="c">
-              <input type="radio" name="a" id="cr-3" checked>
-              <label for="cr-3" style="--hue: 130"></label>
-              <div class="ci" style="--z: 4">
-                <img src="./static/images/real.svg" alt="Real Scene" style="max-height: 250px; width: auto;">
-              </div>
+      </div>
+      <div class="column is-half">
+        <div class="figure-card">
+          <img src="./static/images/real.svg" alt="Real scene setup">
+          <p class="figure-caption">Real captures from physical spacecraft mock-ups.</p>
+        </div>
+      </div>
+    </div>
 
-              <input type="radio" name="a" id="cr-4">
-              <label for="cr-4" style="--hue: 0"></label>
-              <div class="ci" style="--z: 3">
-                <img src="./static/images/real2.svg" alt="Real Scene2" style="max-height: 250px; width: auto;">
-              </div>
-          </div>
+    <div class="columns is-multiline is-variable is-4 mt-4">
+      <div class="column is-one-fifth">
+        <div class="figure-card">
+          <img class="dataset-image" src="./static/images/sat-ssta1-real.png" alt="SS-1A real">
+          <p class="figure-caption">SS-1A (Real)</p>
+        </div>
+      </div>
+      <div class="column is-one-fifth">
+        <div class="figure-card">
+          <img class="dataset-image" src="./static/images/sat-ssta1-virtual.jpg" alt="SS-1A virtual">
+          <p class="figure-caption">SS-1A (Virtual)</p>
+        </div>
+      </div>
+      <div class="column is-one-fifth">
+        <div class="figure-card">
+          <img class="dataset-image" src="./static/images/sat-proba2.jpg" alt="Proba-2">
+          <p class="figure-caption">Proba-2</p>
+        </div>
+      </div>
+      <div class="column is-one-fifth">
+        <div class="figure-card">
+          <img class="dataset-image" src="./static/images/sat-VenusE.jpg" alt="Venus Express">
+          <p class="figure-caption">Venus Express</p>
+        </div>
+      </div>
+      <div class="column is-one-fifth">
+        <div class="figure-card">
+          <img class="dataset-image" src="./static/images/sat-acrim.jpg" alt="Acrimsat">
+          <p class="figure-caption">Acrimsat</p>
         </div>
       </div>
     </div>
   </div>
-  <div class="columns is-centered">
-    
-  </div>
 </section>
 
-<section class="section">
+<section class="section" id="results">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
-        <h2 class="title is-3">Experiment Results</h2>
-    </div>
-    <div class="column">
-      <div class="columns is-centered">
-          <h3 class="title is-4" style="text-align: center;">Pose Estimation</h3>
-      </div>
-      <div class="columns is-centered">
-        <div class="column">
-        <img src="./static/videos/Case2_traj.gif" alt="Pose Estimation" style="max-height: 250px; width: auto;">
-        <h3 class="title is-6" style="text-align: center;">(a) The circular trajectory</h3>
-        </div>
-        <div class="column">
-          <img src="./static/videos/Case4_traj.gif" alt="Pose Estimation" style="max-height: 250px; width: auto;">
-          <h3 class="title is-6" style="text-align: center;">(b) The conical spiral trajectory</h3>
-        </div>
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3">Results</h2>
       </div>
     </div>
 
-    <div class="columns is-centered">
-        <h3 class="title is-4" style="text-align: center;">3D Reconstruction</h3>
+    <div class="figure-card">
+      <img src="./static/images/size_PSNR_num.png" alt="Rate-distortion comparison">
+      <p class="figure-caption">Structural efficiency and rate-distortion comparison against representative baselines.</p>
     </div>
-    <div class="columns is-centered">
-      
-      <div class="column", style="width: 30%">
-        <img src="./static/images/ssta1r_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/ssta1r_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/ssta1r_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/ssta1r_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <h3 class="title is-6" style="text-align: center;">(a) Smart Satellite 1A (Real)</h3>
+
+    <div class="content mt-5">
+      <h3 class="title is-4 has-text-centered">Qualitative Comparison</h3>
+    </div>
+
+    <div class="comparison-table">
+      <div class="comparison-header">
+        <div>Scene</div>
+        <div>Ground Truth</div>
+        <div>Ours</div>
+        <div>GSCodec</div>
+        <div>LightGaussian</div>
+        <div>CompGS</div>
       </div>
-      <div class="column", style="width: 30%">
-        <img src="./static/images/ssta1_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/ssta1_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/ssta1_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/ssta1_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <h3 class="title is-6" style="text-align: center;">(b) Smart Satellite 1A (Virtual)</h3>
+
+      <div class="comparison-row">
+        <div class="comparison-scene">SS-1A (Real)</div>
+        <div><img class="comparison-image" src="./static/images/ss-1A-real-gt60.png" alt="SS-1A real ground truth"></div>
+        <div><img class="comparison-image" src="./static/images/ss-1A-real-our60.png" alt="SS-1A real ours"></div>
+        <div><img class="comparison-image" src="./static/images/ss-1A-real-gsc60.png" alt="SS-1A real GSCodec"></div>
+        <div><img class="comparison-image" src="./static/images/ss-1A-real-lg60.png" alt="SS-1A real LightGaussian"></div>
+        <div><img class="comparison-image" src="./static/images/ss-1A-real-compgs60.png" alt="SS-1A real CompGS"></div>
       </div>
-      <div class="column", style="width: 30%">
-        <img src="./static/images/venus_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/venus_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/venus_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/venus_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <h3 class="title is-6" style="text-align: center;">(c) Venus Express</h3>
+
+      <div class="comparison-row">
+        <div class="comparison-scene">Proba-2</div>
+        <div><img class="comparison-image" src="./static/images/proba2-gt135.jpg" alt="Proba-2 ground truth"></div>
+        <div><img class="comparison-image" src="./static/images/proba2-our135.png" alt="Proba-2 ours"></div>
+        <div><img class="comparison-image" src="./static/images/proba2-gsc135.png" alt="Proba-2 GSCodec"></div>
+        <div><img class="comparison-image" src="./static/images/proba2-lg135.png" alt="Proba-2 LightGaussian"></div>
+        <div><img class="comparison-image" src="./static/images/proba2-compgs135.png" alt="Proba-2 CompGS"></div>
       </div>
-      <div class="column", style="width: 30%">
-        <img src="./static/images/proba2_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/proba2_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/proba2_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <img src="./static/images/proba2_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
-        <h3 class="title is-6" style="text-align: center;">(d) Proba-2</h3>
+    </div>
+
+    <div class="figure-card mt-5">
+      <h3 class="title is-4 has-text-centered">Ablation Takeaways</h3>
+      <div class="content has-text-justified">
+        <p>
+          The geometry layer controls structural sparsity through the pruning threshold <em>τ<sub>r</sub></em>, with <em>τ<sub>r</sub> = 0.005</em> sitting near the quality-compression knee. The appearance layer uses a codebook size of <em>K<sub>m</sub> = 4096</em> to balance fidelity and storage, preserving high-quality renders while keeping the representation compact.
+        </p>
       </div>
     </div>
   </div>
-
 </section>
 
-
-
-
-
-<section class="section" id="BibTeX">
+<section class="section" id="bibtex">
   <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@article{Yang2025NSPAR,
-  author    = {Dazhuang, Yang and Yizhai, Zhang and Ge, Yu and Jiafu, Jiao and Binglu, Wang and Panfeng, Huang},
-  title     = {NeRF-based Simultaneous Pose Estimation and 3D Reconstruction for Non-Cooperative Space Target},
-  journal = {Aerospace Science and Technology},
-  volume = {168},
-  pages = {111010},
-  year = {2026},
-  issn = {1270-9638},
-  doi = {https://doi.org/10.1016/j.ast.2025.111010},
-  url = {https://www.sciencedirect.com/science/article/pii/S1270963825010739},
-
+    <h2 class="title has-text-centered">BibTeX</h2>
+    <pre><code>@article{Yang2026PAH3DGS,
+  author  = {Yang, Dazhuang and Zhao, Tao and Zhang, Yizhai and Shen, Ganghui and Fang, Guotao and Huang, Panfeng and Wang, Binglu},
+  title   = {Physics-Aware Hierarchical 3DGS Compression: An Efficient Representation for Aerospace Objects},
+  year    = {2026}
 }</code></pre>
   </div>
 </section>
@@ -316,29 +292,17 @@
 <footer class="footer">
   <div class="container">
     <div class="content has-text-centered">
-      <a class="icon-link"
-        onclick="alert('The paper link will be provided after publication.')">
+      <a class="icon-link" href="./static/papers/gs-zip.pdf">
         <i class="fas fa-file-pdf"></i>
       </a>
-      <a class="icon-link" href="https://github.com/SingleFYD" class="external-link" disabled>
+      <a class="icon-link" href="https://github.com/Dazhuang-Yang/pahc-3dgs">
         <i class="fab fa-github"></i>
       </a>
     </div>
     <div class="columns is-centered">
       <div class="column is-8">
-        <div class="content">
-          <p>
-            This website is licensed under a <a rel="license"
-                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-          <p>
-            This means you are free to borrow the <a
-              href="https://github.com/nerfies/nerfies.github.io">source code</a> of this website,
-            we just ask that you link back to this page in the footer.
-            Please remember to remove the analytics code included in the header of the website which
-            you do not want on your website.
-          </p>
+        <div class="content has-text-centered">
+          <p>This site summarizes the TAES paper and its main figures.</p>
         </div>
       </div>
     </div>
