@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ablation Curves</title>
   <link rel="stylesheet" href="../css/plots.css">
+  <script src="../js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <style>
     .small-figure { padding: 12px; }
     .chart-caption { text-align: center; margin-top: 8px; font-size: 13px; color: var(--muted); }
@@ -12,10 +14,32 @@
 </head>
 <body>
   <div class="figure small-figure">
-    <div class="title">Structural Efficiency and Rate-Distortion Comparison</div>
+    <div class="title"> Trade-offs in Geometric Strictness and Material Capacity </div>
+    <div style="height: 16px;"></div>
     <div class="grid">
+
       <div class="panel">
-        <div class="panel-title">Codebook Ablation (CR vs PSNR)</div>
+        <div class="panel-title">Ablation on the pruning rejection threshold \(\tau_r\)</div>
+        <div class="interaction-toolbar" aria-label="Interaction toolbar for thresh chart">
+          <button class="tool-btn is-active" id="tool-pan-thresh" type="button" aria-label="Pan mode" title="Pan">
+            <img class="tool-img" src="../logo/move.svg" alt="Pan" data-dark="../logo/move.svg" data-light="../logo/move-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-zoom-thresh" type="button" aria-label="Zoom selection mode" title="Zoom selection">
+            <img class="tool-img" src="../logo/zoom-out.svg" alt="Zoom" data-dark="../logo/zoom-out.svg" data-light="../logo/zoom-out-light.svg">
+          </button>
+          <button class="tool-btn" id="tool-home-thresh" type="button" aria-label="Reset view" title="Reset view">
+            <img class="tool-img" src="../logo/home.svg" alt="Reset" data-dark="../logo/home.svg" data-light="../logo/home-light.svg">
+          </button>
+        </div>
+        <div class="chart-wrap">
+          <svg id="thresh-chart" viewBox="0 0 560 360" aria-label="Threshold ablation"></svg>
+          <div class="tooltip" id="thresh-tooltip"></div>
+          <div class="selection-rect" id="sel-thresh"></div>
+        </div>
+      </div>
+
+            <div class="panel">
+        <div class="panel-title">Ablation on the codebook size \(K_m\)</div>
         <div class="interaction-toolbar" aria-label="Interaction toolbar for codebook chart">
           <button class="tool-btn is-active" id="tool-pan-codebook" type="button" aria-label="Pan mode" title="Pan">
             <img class="tool-img" src="../logo/move.svg" alt="Pan" data-dark="../logo/move.svg" data-light="../logo/move-light.svg">
@@ -34,27 +58,7 @@
         </div>
       </div>
 
-      <div class="panel">
-        <div class="panel-title">Threshold Ablation (CR vs PSNR)</div>
-        <div class="interaction-toolbar" aria-label="Interaction toolbar for thresh chart">
-          <button class="tool-btn is-active" id="tool-pan-thresh" type="button" aria-label="Pan mode" title="Pan">
-            <img class="tool-img" src="../logo/move.svg" alt="Pan" data-dark="../logo/move.svg" data-light="../logo/move-light.svg">
-          </button>
-          <button class="tool-btn" id="tool-zoom-thresh" type="button" aria-label="Zoom selection mode" title="Zoom selection">
-            <img class="tool-img" src="../logo/zoom-out.svg" alt="Zoom" data-dark="../logo/zoom-out.svg" data-light="../logo/zoom-out-light.svg">
-          </button>
-          <button class="tool-btn" id="tool-home-thresh" type="button" aria-label="Reset view" title="Reset view">
-            <img class="tool-img" src="../logo/home.svg" alt="Reset" data-dark="../logo/home.svg" data-light="../logo/home-light.svg">
-          </button>
-        </div>
-        <div class="chart-wrap">
-          <svg id="thresh-chart" viewBox="0 0 560 360" aria-label="Threshold ablation"></svg>
-          <div class="tooltip" id="thresh-tooltip"></div>
-          <div class="selection-rect" id="sel-thresh"></div>
-        </div>
-      </div>
     </div>
-    <div class="chart-caption">Left: results from <em>plot_ablation_codebook.m</em>; Right: results from <em>THRESH.m</em>.</div>
   </div>
 
   <script>
@@ -73,15 +77,22 @@
         Proba2: [28.7721, 28.5989, 29.1826, 34.9500, 36.0542],
         VenusExpress: [26.9562, 27.6435, 28.9523, 30.8000, 31.1720],
         Acrimsat: [32.6506, 33.7051, 34.3619, 36.7767, 37.8317]
+      },
+      Km: {
+        SS1A_Real: [512, 1024, 2048, 4096, 8192],
+        SS1A_Virtual: [512, 1024, 2048, 4096, 8192],
+        Proba2: [512, 1024, 2048, 4096, 8192],
+        VenusExpress: [512, 1024, 2048, 4096, 8192],
+        Acrimsat: [512, 1024, 2048, 4096, 8192]
       }
     };
 
     const threshData = {
-      Acrimsat: { cr: [6.63, 7.40, 7.84, 8.76, 9.98], psnr: [41.5199, 36.7767, 32.1826, 31.5537, 26.6007] },
-      Proba2:   { cr: [5.25, 5.81, 5.83, 5.83, 5.83], psnr: [36.3312, 34.95, 30.8047, 30.4836, 30.7302] },
-      SS1A_Virtual: { cr: [8.01, 8.44, 9.33, 9.62, 9.71], psnr: [35.8448, 33.91, 29.2386, 26.8140, 26.2718] },
-      VenusExpress: { cr: [7.25, 7.81, 8.21, 9.40, 9.68], psnr: [31.6816, 30.8, 29.5542, 28.0708, 26.8478] },
-      SS1A_Real: { cr: [6.72, 6.82, 7.11, 7.11, 7.11], psnr: [37.4680, 37.2212, 35.6331, 36.0255, 35.7580] }
+      Acrimsat: { cr: [6.63, 7.40, 7.84, 8.76, 9.98], psnr: [41.5199, 36.7767, 32.1826, 31.5537, 26.6007], tao: [0.003, 0.005, 0.007, 0.009, 0.011] },
+      Proba2:   { cr: [5.25, 5.81, 5.83, 5.83, 5.83], psnr: [36.3312, 34.95, 30.8047, 30.4836, 30.7302], tao: [0.003, 0.005, 0.007, 0.009, 0.011]  },
+      SS1A_Virtual: { cr: [8.01, 8.44, 9.33, 9.62, 9.71], psnr: [35.8448, 33.91, 29.2386, 26.8140, 26.2718], tao: [0.003, 0.005, 0.007, 0.009, 0.011]  },
+      VenusExpress: { cr: [7.25, 7.81, 8.21, 9.40, 9.68], psnr: [31.6816, 30.8, 29.5542, 28.0708, 26.8478], tao: [0.003, 0.005, 0.007, 0.009, 0.011]  },
+      SS1A_Real: { cr: [6.72, 6.82, 7.11, 7.11, 7.11], psnr: [37.4680, 37.2212, 36.0255, 35.7580, 35.6331], tao: [0.003, 0.005, 0.007, 0.009, 0.011]  }
     };
 
     const seriesOrder = ['SS1A_Real','SS1A_Virtual','Proba2','VenusExpress','Acrimsat'];
@@ -96,12 +107,24 @@
     function niceTicks(min,max,count){ const span = max-min; const step = span/(count-1); const ticks = []; for(let i=0;i<count;i++) ticks.push(Math.round((min + i*step)*100)/100); return ticks; }
     function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 
+    function setTooltipHtml(tooltip, html) {
+      if (window.MathJax && window.MathJax.typesetClear) {
+        window.MathJax.typesetClear([tooltip]);
+      }
+      tooltip.innerHTML = html;
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise([tooltip]).catch(() => {});
+      }
+    }
+
     function drawPanel(svgId, tooltipId, dataSets, xlim, ylim){
       const svg = document.getElementById(svgId); const tooltip = document.getElementById(tooltipId);
       const vb = svg.viewBox.baseVal; const W = vb.width, H = vb.height;
       const margin = {left:72, right:20, top:18, bottom:72}; const inner = {left:margin.left, top:margin.top, width: W - margin.left - margin.right, height: H - margin.top - margin.bottom};
       while(svg.firstChild) svg.removeChild(svg.firstChild);
-      const g = svgEl('g'); svg.appendChild(g);
+        const oldAxisLabel = svg.parentElement.querySelector('.axis-html-label');
+        if (oldAxisLabel) oldAxisLabel.remove();
+        const g = svgEl('g'); svg.appendChild(g);
 
       // domain and interaction state (will be used by interactive redraw)
       const defaultDomain = { xMin: xlim[0], xMax: xlim[1], yMin: ylim[0], yMax: ylim[1] };
@@ -123,6 +146,9 @@
       // draw function that uses current domain
       function drawChart() {
         while (g.firstChild) g.removeChild(g.firstChild);
+        // remove previous HTML axis label to avoid duplicates after redraw
+        const prevAxis = svg.parentElement.querySelector('.axis-html-label');
+        if (prevAxis) prevAxis.remove();
         xScale = scaleLinear(domain.xMin, domain.xMax, inner.left, inner.left + inner.width);
         yScale = scaleLinear(domain.yMin, domain.yMax, inner.top + inner.height, inner.top);
         invXScale = scaleLinear(inner.left, inner.left + inner.width, domain.xMin, domain.xMax);
@@ -140,7 +166,24 @@
         g.appendChild(svgEl('line',{x1:inner.left,y1:inner.top+inner.height,x2:inner.left+inner.width,y2:inner.top+inner.height,stroke:'#777','stroke-width':1.2}));
 
         // axis labels
-        const xl = svgEl('text',{x:inner.left+inner.width/2,y:inner.top+inner.height+46,'text-anchor':'middle',class:'axis-label'}); xl.textContent = 'Storage Compression Ratio (CR$_s \\times$)'; g.appendChild(xl);
+        const axisLabel = document.createElement('div');
+        axisLabel.className = 'axis-html-label';
+        axisLabel.style.left = '0';
+        axisLabel.style.right = '0';
+        axisLabel.style.top = `${((inner.top + inner.height + 34) / H) * 100}%`;
+        axisLabel.style.textAlign = 'center';
+        axisLabel.append('Storage Compression Ratio (');
+
+        const mathSpan = document.createElement('span');
+        mathSpan.className = 'axis-tex';
+        mathSpan.innerHTML = '\\(\\mathrm{CR}_{s} \\times\\)';
+        axisLabel.appendChild(mathSpan);
+
+        axisLabel.append(')');
+        svg.parentElement.appendChild(axisLabel);
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise([mathSpan]).catch(() => {});
+        }
         const yl = svgEl('text',{x:16,y:inner.top+inner.height/2,transform:`rotate(-90 16 ${inner.top+inner.height/2})`,'text-anchor':'middle',class:'axis-label'}); yl.textContent = 'Quantized PSNR (dB)'; g.appendChild(yl);
 
         // draw series
@@ -154,11 +197,52 @@
           } else return;
 
           const line = pts.map((p,i)=> (i===0?`M ${xScale(p.x)} ${yScale(p.y)}`:`L ${xScale(p.x)} ${yScale(p.y)}`)).join(' ');
-          seriesGroup.appendChild(svgEl('path',{d:line,stroke:colors[idx],fill:'none','stroke-width':1.6,'stroke-linejoin':'round'}));
-          pts.forEach((p,i)=>{ const cx = xScale(p.x), cy = yScale(p.y); const circle = svgEl('circle',{cx,cy,r:6,fill:colors[idx],opacity:0.9});
-            circle.addEventListener('mouseenter', (ev)=>{ tooltip.style.left = (ev.offsetX+12)+'px'; tooltip.style.top = (ev.offsetY+12)+'px'; tooltip.style.opacity='1'; tooltip.innerHTML = `<strong>${seriesNames[key]}</strong><br>CR: ${p.x}<br>PSNR: ${p.y.toFixed(2)} dB`; });
-            circle.addEventListener('mouseleave', ()=>{ tooltip.style.opacity='0'; }); seriesGroup.appendChild(circle);
+          // create path element for the series and mark with data-series for identification
+          const pathEl = svgEl('path',{d:line,stroke:colors[idx],fill:'none','stroke-width':1.6,'stroke-linejoin':'round','data-series':key,'class':'series-path'});
+          seriesGroup.appendChild(pathEl);
+
+          // create circles (visual points) and attach event listeners so hovering points also highlights series
+          pts.forEach((p,i)=>{
+            const cx = xScale(p.x), cy = yScale(p.y);
+            const circle = svgEl('circle', {cx, cy, r:6, fill:colors[idx], opacity:0.9, 'data-series':key, 'class':'series-point'});
+            // event handlers will reuse the same closures as the path handlers
+            seriesGroup.appendChild(circle);
+
+            // mouse enter on point should show a point-local label, while still highlighting the full series
+            circle.addEventListener('mouseenter', (ev)=>{ highlightSeries(ev, p, i); });
+            circle.addEventListener('mousemove', (ev)=>{ moveTooltip(ev); });
+            circle.addEventListener('mouseleave', ()=>{ unhighlightSeries(); });
           });
+
+          // handlers: highlight this series and show aggregated tooltip
+          function highlightSeries(ev, point, pointIndex){
+            const allPaths = seriesGroup.querySelectorAll('.series-path');
+            allPaths.forEach(p => { if(p !== pathEl) p.setAttribute('opacity','0.25'); else p.setAttribute('opacity','1'); });
+            const allPoints = seriesGroup.querySelectorAll('.series-point');
+            allPoints.forEach(c => {
+              if (c.getAttribute('data-series') === key) { c.setAttribute('r','7'); c.setAttribute('opacity','1'); }
+              else { c.setAttribute('r','5'); c.setAttribute('opacity','0.35'); }
+            });
+            const extra = (svgId === 'codebook-chart' && dataSets && dataSets.Km && Array.isArray(dataSets.Km[key]))
+              ? `<br>\\(K_m\\): ${dataSets.Km[key][pointIndex]}`
+              : (dataSets && dataSets[key] && Array.isArray(dataSets[key].tao))
+                ? `<br>\\(\\tau_r\\): ${dataSets[key].tao[pointIndex]}`
+                : '';
+            const html = `CR: ${point.x}<br>PSNR: ${point.y.toFixed(2)} dB${extra}`;
+            const rect = svg.parentElement.getBoundingClientRect();
+            tooltip.style.left = (ev.clientX - rect.left + 12) + 'px';
+            tooltip.style.top = (ev.clientY - rect.top + 12) + 'px';
+            tooltip.style.opacity = '1';
+            setTooltipHtml(tooltip, html);
+          }
+
+          function moveTooltip(ev){ const rect = svg.parentElement.getBoundingClientRect(); tooltip.style.left = (ev.clientX - rect.left + 12) + 'px'; tooltip.style.top = (ev.clientY - rect.top + 12) + 'px'; }
+
+          function unhighlightSeries(){ const allPaths = seriesGroup.querySelectorAll('.series-path'); allPaths.forEach(p => p.setAttribute('opacity','1')); const allPoints = seriesGroup.querySelectorAll('.series-point'); allPoints.forEach(c => { c.setAttribute('r','6'); c.setAttribute('opacity','0.9'); }); tooltip.style.opacity='0'; }
+
+          pathEl.addEventListener('mouseenter', (ev)=>{ highlightSeries(ev, pts[0], 0); });
+          pathEl.addEventListener('mousemove', moveTooltip);
+          pathEl.addEventListener('mouseleave', unhighlightSeries);
         });
 
         g.appendChild(seriesGroup);

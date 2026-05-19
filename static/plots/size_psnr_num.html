@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Size vs PSNR / Number of Points</title>
   <link rel="stylesheet" href="../css/plots.css">
+  <script src="../js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
   <div class="figure">
@@ -71,7 +73,7 @@
       [0.90, 0.10, 0.10]
     ];
 
-    const markerSize = (method) => method === 'Ours' ? 16 : 10;
+    const markerSize = (method) => method === 'Ours' ? 12 : 10;
 
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
@@ -132,7 +134,7 @@
       }
     }
 
-    function drawAxes(parent, inner, config) {
+    function drawAxes(parent, inner, config, yMultiplier) {
       const { left, top, width, height } = inner;
       const xAxisY = top + height;
 
@@ -173,8 +175,47 @@
         'text-anchor': 'middle',
         class: 'axis-label'
       });
-      yLabel.textContent = config.yLabel;
-      parent.appendChild(yLabel);
+        // support explicit numeric multiplier (e.g. 1e4) passed as yMultiplier
+        // Do NOT parse or remove parenthesized content from config.yLabel here; show label as provided.
+        yLabel.textContent = config.yLabel || '';
+        parent.appendChild(yLabel);
+
+        // remove any previous multiplier element to avoid duplicates
+        try {
+          const chartWrap = parent.ownerSVGElement && parent.ownerSVGElement.parentElement;
+          if (chartWrap) {
+            if (getComputedStyle(chartWrap).position === 'static') chartWrap.style.position = 'relative';
+            const prev = chartWrap.querySelector('.y-scale-mult');
+            if (prev) prev.remove();
+
+            if (yMultiplier) {
+              // render explicit scientific multiplier like \(\times10^{4}\)
+              const exp = Number.isFinite(Math.log10(Number(yMultiplier))) ? Math.round(Math.log10(Number(yMultiplier))) : null;
+              if (exp !== null) {
+                const multDiv = document.createElement('div');
+                multDiv.className = 'y-scale-mult';
+                multDiv.style.position = 'absolute';
+                multDiv.style.left = `${inner.left - 10}px`;
+                multDiv.style.top = `${inner.top -20}px`;
+                multDiv.style.fontSize = '13px';
+                multDiv.style.color = '#333';
+                multDiv.style.pointerEvents = 'none';
+                multDiv.style.zIndex = '20';
+                const mathSpan = document.createElement('span');
+                mathSpan.textContent = `\\(\\times10^{${exp}}\\)`;
+                multDiv.appendChild(mathSpan);
+                chartWrap.appendChild(multDiv);
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                  window.MathJax.typesetPromise([mathSpan]).catch(()=>{});
+                }
+              }
+            }
+          } else {
+            parent.appendChild(yLabel);
+          }
+        } catch (e) {
+          parent.appendChild(yLabel);
+        }
     }
 
     // Legend will be drawn as SVG inside the chart to match ablation pages
@@ -323,7 +364,7 @@
             : (tick) => formatTickAdaptive(tick, domain.yMax - domain.yMin)
         };
 
-        drawAxes(viewport, inner, drawConfig);
+        drawAxes(viewport, inner, drawConfig, drawConfig.yMultiplier);
 
         const seriesGroup = svgEl('g', { 'clip-path': `url(#${clipId})` });
         data.forEach((method, index) => {
@@ -393,8 +434,10 @@
         let ly = inner.top + inner.height - totalH - 6;
         if (ly < inner.top + 6) ly = inner.top + 6;
         items.forEach((it, idx) => {
-          const rect = svgEl('rect', { x: lx, y: ly, width: 12, height: 8, fill: it.color });
-          legendSvg.appendChild(rect);
+          // draw the marker shape for legend using the same markerPath helper
+          const markerD = markerPath(markers[idx], lx + 6, ly + 4, 6);
+          const markerPathEl = svgEl('path', { d: markerD, fill: it.color, stroke: it.color, 'stroke-width': 1 });
+          legendSvg.appendChild(markerPathEl);
           const t = svgEl('text', { x: lx + 18, y: ly + 8, class: 'legend-label' });
           t.textContent = it.label;
           legendSvg.appendChild(t);
@@ -608,7 +651,8 @@
       zoom: 'tool-zoom-points',
       home: 'tool-home-points'
     }, pointData, {
-      yLabel: 'Number of Points (*10^4)',
+      yLabel: 'Number of Points',
+      yMultiplier: 1e4,
       xLabel: 'Size (MB)',
       tooltipLabel: 'Points',
       xTicks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18],
