@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Deformable Neural Radiance Fields creates free-viewpoint portraits (nerfies) from casually captured videos.">
+  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeRF-based Simultaneous Pose Estimation and 3D Reconstruction for Non-Cooperative Space Target</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/logo.png">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item"> <!---to do: here can add my resume--->
+      <span class="icon">
+          <i class="fas fa-home"></i>
+      </span>
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          More Research
+        </a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="https://ieeexplore.ieee.org/document/9327292">
+            Tiltable Quadrotor
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">NeRF-based Simultaneous Pose Estimation and 3D Reconstruction for Non-Cooperative Space Target</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://www.researchgate.net/profile/Dazhuang-Yang">Dazhuang Yang<sup>1</sup></a>,</span>
+            <span class="author-block">
+              <a>Yizhai Zhang<sup>1</sup></a>,</span>
+            <span class="author-block">
+              <a>Ge Yu<sup>2</sup></a>,</span>
+            <span class="author-block">
+              <a>Jiafu Jiao<sup>1</sup></a>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?hl=en&user=-eey0pkAAAAJ">Binglu Wang<sup>1</sup></a>,</span>
+            <span class="author-block">
+              <a href="https://www.researchgate.net/profile/Panfeng-Huang">Panfeng Huang<sup>1</sup></a></span>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">1. Northwestern Polytechnical University, Xi'an, China</span>
+            <span class="author-block">2. Shanghai Aerospace System Engineering, Shanghai, China</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+                <span class="link-block">
+                <a class="external-link button is-normal is-rounded is-dark" onclick="alert('The paper link will be provided after publication.')">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/DazhuangYang/nspar-ncst"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <span class="link-block"> 
+                <!-- href="" -->
+                <a href="https://drive.google.com/drive/folders/1w16AACVh-1RRXbIkOZE7XNZL1KqBN9GN?usp=drive_link"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-database"></i>
+                  </span>
+                  <span>Dataset</span>
+                </a>
+              </span>
+              <span class="link-block"> 
+                <!-- href="" -->
+                <a href="https://github.com/DazhuangYang/SPARD"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <img src="./static/images/unreal.svg" style="width: 2em; height: 2em;" alt="Unreal Engine">
+                  </span>
+                  <span>UE project</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section", style="background-color: rgba(213, 213, 213, 0.225);">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p aria-hidden="true">
+            Accurate pose estimation and 3D reconstruction of Non-Cooperative Space Targets (NCSTs) are critical for proximity operations in active debris removal and on-orbit servicing. In this paper, we propose a novel NeRF-based Simultaneous Pose Estimation and 3D Reconstruction (SPAR) framework to address the challenges of efficiency and reliability in traditional point-based methods, which contains three key components, \ie a multi-resolution hash encoder to reduce computational cost, a 2D keyframe feature enhancement to guide view generalization, and a direct photometric constraint to stabilize pose estimation. Furthermore, the proposed framework is evaluated on a newly constructed Spacecraft Pose Estimation and 3D Reconstruction Dataset (SPARD), comprising both synthetic and real RGB-D images and the experimental results demonstrate its effectiveness. Our framework achieves real-time processing at 51 Hz with a pose estimation accuracy of 1.26 cm translation error and 0.97° rotation error. The results show improvements over traditional and NeRF-based baselines, validating its applicability to space missions with NCST.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+        <h2 class="title is-3">Pipeline</h2>
+    </div>
+    <div class="column">
+      <div class="columns">
+        <div class="column", style="text-align: center;">
+          <img src="./static/images/pipeline.svg" alt="Pipeline Image", style="height: auto; width: 90%;">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+        <h2 class="title is-3" style="text-align: center;">Spacecraft Pose Estimation and 3D Reconstruction Dataset <br>(SPARD)</h2>
+    </div>
+    <div class="column">
+      <div class="columns">
+        <div class="column">
+          <h3 class="title is-4" style="text-align: center;">Synthetic Scene Setup</h3>
+          <div class="c">
+            <input type="radio" name="a1" id="cr-1" checked>
+            <label for="cr-1" style="--hue:130"></label>
+            <div class="ci" style="--z: 4">
+              <img src="./static/images/synthetic.svg" alt="Synthetic Scene" style="height: 250px; width: auto;">
+            </div>
+
+            <input type="radio" name="a1" id="cr-2">
+            <label for="cr-2" style="--hue: 0"></label>
+            <div class="ci" style="--z: 3">
+              <video id="dollyzoom" autoplay controls muted loop playsinline height=250>
+                <source src="./static/videos/synthetic.mp4"
+                        type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <h3 class="title is-4",  style="text-align: center;">Real Scene Setup</h3>
+          <div class="c">
+              <input type="radio" name="a" id="cr-3" checked>
+              <label for="cr-3" style="--hue: 130"></label>
+              <div class="ci" style="--z: 4">
+                <img src="./static/images/real.svg" alt="Real Scene" style="max-height: 250px; width: auto;">
+              </div>
+
+              <input type="radio" name="a" id="cr-4">
+              <label for="cr-4" style="--hue: 0"></label>
+              <div class="ci" style="--z: 3">
+                <img src="./static/images/real2.svg" alt="Real Scene2" style="max-height: 250px; width: auto;">
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="columns is-centered">
+    
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+        <h2 class="title is-3">Experiment Results</h2>
+    </div>
+    <div class="column">
+      <div class="columns is-centered">
+          <h3 class="title is-4" style="text-align: center;">Pose Estimation</h3>
+      </div>
+      <div class="columns is-centered">
+        <div class="column">
+        <img src="./static/videos/Case2_traj.gif" alt="Pose Estimation" style="max-height: 250px; width: auto;">
+        <h3 class="title is-6" style="text-align: center;">(a) The circular trajectory</h3>
+        </div>
+        <div class="column">
+          <img src="./static/videos/Case4_traj.gif" alt="Pose Estimation" style="max-height: 250px; width: auto;">
+          <h3 class="title is-6" style="text-align: center;">(b) The conical spiral trajectory</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+        <h3 class="title is-4" style="text-align: center;">3D Reconstruction</h3>
+    </div>
+    <div class="columns is-centered">
+      
+      <div class="column", style="width: 30%">
+        <img src="./static/images/ssta1r_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/ssta1r_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/ssta1r_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/ssta1r_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <h3 class="title is-6" style="text-align: center;">(a) Smart Satellite 1A (Real)</h3>
+      </div>
+      <div class="column", style="width: 30%">
+        <img src="./static/images/ssta1_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/ssta1_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/ssta1_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/ssta1_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <h3 class="title is-6" style="text-align: center;">(b) Smart Satellite 1A (Virtual)</h3>
+      </div>
+      <div class="column", style="width: 30%">
+        <img src="./static/images/venus_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/venus_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/venus_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/venus_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <h3 class="title is-6" style="text-align: center;">(c) Venus Express</h3>
+      </div>
+      <div class="column", style="width: 30%">
+        <img src="./static/images/proba2_ce1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/proba2_ce2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/proba2_de1.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <img src="./static/images/proba2_de2.png" alt="3D Reconstruction" style="max-height: 250px; width: 48%;">
+        <h3 class="title is-6" style="text-align: center;">(d) Proba-2</h3>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{Yang2025NSPAR,
+  author    = {Dazhuang, Yang and Yizhai, Zhang and Ge, Yu and Jiafu, Jiao and Binglu, Wang and Panfeng, Huang},
+  title     = {NeRF-based Simultaneous Pose Estimation and 3D Reconstruction for Non-Cooperative Space Target},
+  journal = {Aerospace Science and Technology},
+  volume = {168},
+  pages = {111010},
+  year = {2026},
+  issn = {1270-9638},
+  doi = {https://doi.org/10.1016/j.ast.2025.111010},
+  url = {https://www.sciencedirect.com/science/article/pii/S1270963825010739},
+
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link"
+        onclick="alert('The paper link will be provided after publication.')">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/SingleFYD" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            This means you are free to borrow the <a
+              href="https://github.com/nerfies/nerfies.github.io">source code</a> of this website,
+            we just ask that you link back to this page in the footer.
+            Please remember to remove the analytics code included in the header of the website which
+            you do not want on your website.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
