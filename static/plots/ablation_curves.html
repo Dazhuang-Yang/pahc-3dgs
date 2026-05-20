@@ -120,7 +120,7 @@
     function drawPanel(svgId, tooltipId, dataSets, xlim, ylim){
       const svg = document.getElementById(svgId); const tooltip = document.getElementById(tooltipId);
       const vb = svg.viewBox.baseVal; const W = vb.width, H = vb.height;
-      const margin = {left:72, right:20, top:18, bottom:72}; const inner = {left:margin.left, top:margin.top, width: W - margin.left - margin.right, height: H - margin.top - margin.bottom};
+      const margin = {left:72, right:20, top:0, bottom:72}; const inner = {left:margin.left, top:margin.top, width: W - margin.left - margin.right, height: H - margin.top - margin.bottom};
       while(svg.firstChild) svg.removeChild(svg.firstChild);
         const oldAxisLabel = svg.parentElement.querySelector('.axis-html-label');
         if (oldAxisLabel) oldAxisLabel.remove();

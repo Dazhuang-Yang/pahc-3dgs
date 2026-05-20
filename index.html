@@ -49,7 +49,6 @@
       </div>
       <a class="navbar-item" href="#abstract">Abstract</a>
       <a class="navbar-item" href="#method">Method</a>
-      <a class="navbar-item" href="#dataset">Dataset</a>
       <a class="navbar-item" href="#results">Results</a>
       <a class="navbar-item" href="#bibtex">BibTeX</a>  
     </div>
@@ -126,10 +125,10 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            While 3D Gaussian Splatting (3DGS) has revolutionized real-time rendering with high visual fidelity, its unstructured and discrete nature poses significant challenges for efficient storage and transmission, especially in bandwidth-constrained space-ground communications. Existing compression paradigms rely on signal redundancy, often leading to geometric collapse on complex structures at extreme bitrates.
-          </p>
-          <p>
-            We propose a physics-aware hierarchical 3DGS compression framework tailored for aerospace objects. The method reconfigures compression from pixel-level entropy coding to semantic-oriented component reorganization. A geometry layer condenses repetitive structures into compact meta-templates through spectral divergence pruning, rigid alignment, and differentiable refinement, while an appearance layer exploits material sparsity via component-wise manifold vector quantization. Experiments on SPARD show strong rate-distortion performance and a compact representation suitable for on-orbit servicing.
+            While 3D Gaussian Splatting (3DGS) has revolutionized real-time rendering with high visual fidelity, its unstructured and discrete nature poses significant challenges for efficient storage and transmission, especially in bandwidth-constrained space-ground communications. Existing compression paradigms rely on signal redundancy, often leading to geometric collapse on complex structures at extreme bitrates. To overcome these limitations, we propose a physics-aware hierarchical 3DGS compression framework tailored for aerospace objects. Our approach reconfigures the compression paradigm, departing from conventional pixel-level entropy coding toward semantic-oriented component reorganization. Specifically, a geometry layer condenses repetitive structures into compact meta-templates via a coarse-to-fine cascade: spectral divergence pruning, robust rigid alignment, and alternating differentiable refinement. Subsequently, an appearance layer exploits material sparsity through component-wise manifold vector quantization.
+            Extensive evaluations on the Spacecraft Pose Estimation and 3D Reconstruction Dataset (SPARD) demonstrate that our method effectively addresses the rate-distortion bottlenecks of current compression paradigms. 
+            It achieves an approximately 8$\times$ storage compression ratio, compressing the explicit 3D representation to about 2 MB while maintaining high-fidelity visual quality above 30 dB.
+            By synergistically decoupling spatial topology and material statistics, our method preserves structural integrity and delivers a robust, high efficiency 3D representation for on-orbit servicing tasks.
           </p>
         </div>
       </div>
@@ -168,52 +167,152 @@
         <h2 class="title is-3">Results</h2>
       </div>
     </div>
-    
+
       <iframe src="./static/plots/size_psnr_num.html" title="Rate-distortion comparison" style="width:100%; height:450px; border:0; display:block;"></iframe>
 
       <iframe src="./static/plots/ablation_curves.html" title="Ablation curves" style="width:100%; height:450px; border:0; display:block; margin-top:18px;"></iframe>
 
-    <div class="content mt-5">
-      <h3 class="title is-4 has-text-centered">Qualitative Comparison</h3>
-    </div>
-
-    <div class="comparison-table">
-      <div class="comparison-header">
-        <div>Scene</div>
-        <div>Ground Truth</div>
-        <div>Ours</div>
-        <div>GSCodec</div>
-        <div>LightGaussian</div>
-        <div>CompGS</div>
-      </div>
-
-      <div class="comparison-row">
-        <div class="comparison-scene">SS-1A (Real)</div>
-        <div><img class="comparison-image" src="./static/images/ss-1A-real-gt60.png" alt="SS-1A real ground truth"></div>
-        <div><img class="comparison-image" src="./static/images/ss-1A-real-our60.png" alt="SS-1A real ours"></div>
-        <div><img class="comparison-image" src="./static/images/ss-1A-real-gsc60.png" alt="SS-1A real GSCodec"></div>
-        <div><img class="comparison-image" src="./static/images/ss-1A-real-lg60.png" alt="SS-1A real LightGaussian"></div>
-        <div><img class="comparison-image" src="./static/images/ss-1A-real-compgs60.png" alt="SS-1A real CompGS"></div>
-      </div>
-
-      <div class="comparison-row">
-        <div class="comparison-scene">Proba-2</div>
-        <div><img class="comparison-image" src="./static/images/proba2-gt135.jpg" alt="Proba-2 ground truth"></div>
-        <div><img class="comparison-image" src="./static/images/proba2-our135.png" alt="Proba-2 ours"></div>
-        <div><img class="comparison-image" src="./static/images/proba2-gsc135.png" alt="Proba-2 GSCodec"></div>
-        <div><img class="comparison-image" src="./static/images/proba2-lg135.png" alt="Proba-2 LightGaussian"></div>
-        <div><img class="comparison-image" src="./static/images/proba2-compgs135.png" alt="Proba-2 CompGS"></div>
-      </div>
-    </div>
 
   </div>
+    
+    <div class="visual-comparisons mt-6">
+      <h3 class="title is-4 has-text-centered">Visual Comparisons (Videos)</h3>
+
+      <style>
+        .vc-grid { display:grid; gap:18px; margin-top:18px; justify-content:center; --vc-card-width: calc((100% - 36px) / 3); }
+        .vc-grid-2 { grid-template-columns: repeat(2, minmax(0, var(--vc-card-width))); }
+        .vc-grid-3 { grid-template-columns: repeat(3, minmax(0, var(--vc-card-width))); }
+        .vc-compare { width:100%; margin:0; }
+        .vc-title { margin:0 0 8px; text-align:center; font-size:1.05rem; font-weight:700; color:#1f1f1f; }
+        .vc-inner { position:relative; width:100%; padding-top:56.25%; background:#000; border-radius:10px; overflow:hidden; }
+        .vc-side { position:absolute; inset:0; overflow:hidden; }
+        .vc-side-split { position:absolute; overflow:hidden; }
+        .vc-side-split img { position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-drag:none; }
+        .vc-right-wrap { z-index:1; }
+        .vc-right-split { clip-path: polygon(var(--split-x, 50%) 0, 100% 0, 100% 100%, var(--split-x, 50%) 100%); }
+        .vc-left-wrap { z-index:2; }
+        .vc-left-split { clip-path: polygon(0 0, var(--split-x, 50%) 0, var(--split-x, 50%) 100%, 0 100%); }
+        .vc-divider { position:absolute; top:0; bottom:0; width:28px; left:50%; transform:translateX(-50%); cursor:ew-resize; z-index:4; touch-action:none; user-select:none; }
+        .vc-divider:before { content:''; position:absolute; left:50%; top:0; bottom:0; width:2px; transform:translateX(-50%); background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,0.08); }
+        .vc-handle { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:30px; height:30px; margin-left:0; border-radius:50%; background:rgba(255,255,255,0.70); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,0.25); }
+        .vc-handle:after { content:'\00AB\00BB'; font-size:16px; color:#444; }
+        .vc-caption-row { display:flex; justify-content:space-between; margin-top:8px; font-size:0.95rem; }
+        .vc-caption { background:rgba(255, 255, 255); color:#000; padding:6px 8px; border-radius:6px; display:inline-block; }
+        @media (max-width:800px){ .vc-grid-2, .vc-grid-3 { grid-template-columns:1fr; --vc-card-width: 100%; } .vc-inner{padding-top:56.25%} .vc-caption-row{flex-direction:column; gap:6px} }
+      </style>
+
+      <div class="content has-text-centered" style="width:80%; margin:0 auto;">
+      
+      <div class="vc-grid vc-grid-2">
+        <div class="vc-compare" data-title="SS-1A (Real)" data-trim="100 20 100 20" data-left="./static/video/ssa1real_gt.webp" data-right="./static/video/ssa1real_ours.webp" data-leftlabel="Ground Truth" data-rightlabel="Ours"></div>
+        <div class="vc-compare" data-title="SS-1A (Virtual)" data-trim="0 0 0 0" data-left="./static/video/ssa1virtual_gt.webp" data-right="./static/video/ssa1virtual_ours.webp" data-leftlabel="Ground Truth" data-rightlabel="Ours"></div>
+      </div>
+      <div class="vc-grid vc-grid-3">
+        <div class="vc-compare" data-title="Acrimsat" data-trim="100 80 100 30" data-left="./static/video/Acrimsat_gt.webp" data-right="./static/video/Acrimsat_ours.webp" data-leftlabel="Ground Truth" data-rightlabel="Ours"></div>
+        <div class="vc-compare" data-title="Proba-2" data-trim="100 90 100 30" data-left="./static/video/proba2_gt.webp" data-right="./static/video/proba2_ours.webp" data-leftlabel="Ground Truth" data-rightlabel="Ours"></div>
+        <div class="vc-compare" data-title="Venus Express" data-trim="80 0 80 20" data-left="./static/video/venus_gt.webp" data-right="./static/video/venus_ours.webp" data-leftlabel="Ground Truth" data-rightlabel="Ours"></div>
+      </div>
+
+      </div>
+
+      <script>
+        (function(){
+          function createCompare(el){
+            const leftSrc = el.dataset.left;
+            const rightSrc = el.dataset.right;
+            const title = el.dataset.title || el.dataset.leftlabel || 'Comparison';
+            const leftLabel = el.dataset.leftlabel || 'Left';
+            const rightLabel = el.dataset.rightlabel || 'Right';
+            const trimValues = (el.dataset.trim || '').trim().split(/\s+/).filter(Boolean);
+            const trimLeft = trimValues[0] || '0';
+            const trimBottom = trimValues[1] || '0';
+            const trimRight = trimValues[2] || '0';
+            const trimTop = trimValues[3] || '0';
+            const toCssLength = (value) => /^-?\d+(?:\.\d+)?$/.test(value) ? `${value}px` : value;
+            el.innerHTML = `
+              <div class="vc-title">${title}</div>
+              <div class="vc-inner">
+                <div class="vc-side vc-left-wrap"><div class="vc-side-split vc-left-split"><img class="vc-left" src="${leftSrc}" alt="${leftLabel}"></div></div>
+                <div class="vc-side vc-right-wrap"><div class="vc-side-split vc-right-split"><img class="vc-right" src="${rightSrc}" alt="${rightLabel}"></div></div>
+                <div class="vc-divider"><div class="vc-handle"></div></div>
+              </div>
+              <div class="vc-caption-row">
+                <div class="vc-caption">${leftLabel}</div>
+                <div class="vc-caption">${rightLabel}</div>
+              </div>
+            `;
+            const inner = el.querySelector('.vc-inner');
+            const leftWrap = el.querySelector('.vc-left-wrap');
+            const rightWrap = el.querySelector('.vc-right-wrap');
+            const leftSplit = el.querySelector('.vc-left-split');
+            const rightSplit = el.querySelector('.vc-right-split');
+            const rightImg = el.querySelector('.vc-right');
+            const leftImg = el.querySelector('.vc-left');
+            const divider = el.querySelector('.vc-divider');
+            const handle = el.querySelector('.vc-handle');
+            inner.style.setProperty('--trim-left', toCssLength(trimLeft));
+            inner.style.setProperty('--trim-bottom', toCssLength(trimBottom));
+            inner.style.setProperty('--trim-right', toCssLength(trimRight));
+            inner.style.setProperty('--trim-top', toCssLength(trimTop));
+
+            function applyTrimLayout(){
+              const rect = inner.getBoundingClientRect();
+              const leftPx = parseFloat(getComputedStyle(inner).getPropertyValue('--trim-left')) || 0;
+              const rightPx = parseFloat(getComputedStyle(inner).getPropertyValue('--trim-right')) || 0;
+              const topPx = parseFloat(getComputedStyle(inner).getPropertyValue('--trim-top')) || 0;
+              const bottomPx = parseFloat(getComputedStyle(inner).getPropertyValue('--trim-bottom')) || 0;
+              const expandedWidth = Math.max(0, rect.width + leftPx + rightPx);
+              const expandedHeight = Math.max(0, rect.height + topPx + bottomPx);
+
+              [leftSplit, rightSplit].forEach(split => {
+                split.style.left = `${-leftPx}px`;
+                split.style.top = `${-topPx}px`;
+                split.style.width = `${expandedWidth}px`;
+                split.style.height = `${expandedHeight}px`;
+              });
+            }
+
+            // divider drag
+            let dragging = false;
+            function setDividerByClientX(clientX){
+              const rect = inner.getBoundingClientRect();
+              let x = clientX - rect.left;
+              x = Math.max(6, Math.min(rect.width-6, x));
+              inner.style.setProperty('--split-x', `${x}px`);
+              divider.style.left = x + 'px';
+            }
+            function startDrag(e){
+              dragging = true;
+              setDividerByClientX(e.clientX);
+              e.preventDefault();
+            }
+            divider.addEventListener('mousedown', startDrag);
+            inner.addEventListener('mousedown', startDrag);
+            window.addEventListener('mousemove', (e)=>{ if(!dragging) return; setDividerByClientX(e.clientX); });
+            window.addEventListener('mouseup', ()=>{ dragging=false; });
+            // allow click on container to move divider immediately
+            inner.addEventListener('click', (e)=>{ if(e.target === divider || e.target === handle) return; setDividerByClientX(e.clientX); });
+
+            // initialize divider center
+            function init(){ const rect = inner.getBoundingClientRect(); const w = rect.width || inner.offsetWidth || 640; const x = Math.round(w/2); inner.style.setProperty('--split-x', `${x}px`); divider.style.left = x+'px'; applyTrimLayout(); }
+            // resize observer
+            const ro = new ResizeObserver(()=>init()); ro.observe(inner);
+            // try to init after load
+            setTimeout(init,200);
+          }
+
+          document.querySelectorAll('.vc-compare').forEach(createCompare);
+        })();
+      </script>
+
+    </div>
 </section>
 
 <section class="section" id="bibtex">
   <div class="container is-max-desktop content">
     <h2 class="title has-text-centered">BibTeX</h2>
     <pre><code>@article{Yang2026PAH3DGS,
-  author  = {Yang, Dazhuang and Zhao, Tao and Zhang, Yizhai and Shen, Ganghui and Fang, Guotao and Huang, Panfeng and Wang, Binglu},
+  author  = {Dazhuang Yang and Tao Zhao and Yizhai Zhang and Ganghui Shen and Guotao Fang and Panfeng Huang and Binglu Wang},
   title   = {Physics-Aware Hierarchical 3DGS Compression: An Efficient Representation for Aerospace Objects},
   year    = {2026}
 }</code></pre>
@@ -223,17 +322,20 @@
 <footer class="footer">
   <div class="container">
     <div class="content has-text-centered">
-      <a class="icon-link" href="./static/papers/gs-zip.pdf">
+        <a onclick="alert('The paper link will be provided after publication.')" class="icon-link">
         <i class="fas fa-file-pdf"></i>
       </a>
       <a class="icon-link" href="https://github.com/Dazhuang-Yang/pahc-3dgs">
         <i class="fab fa-github"></i>
       </a>
+      <a class="icon-link" href="mailto:yang_dazhuang@mail.nwpu.edu.cn" onclick="alert('If you have any questions, please feel free to email me at yang_dazhuang@mail.nwpu.edu.cn.')">
+        <i class="fas fa-envelope"></i>
+      </a>
     </div>
     <div class="columns is-centered">
       <div class="column is-8">
         <div class="content has-text-centered">
-          <p>This site summarizes the TAES paper and its main figures.</p>
+          <p>This site summarizes the PAHC-3DGS paper and its main figures.</p>
         </div>
       </div>
     </div>
