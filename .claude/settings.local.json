@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(conda activate *)",
+      "Bash(python mp4_to_webp.py --input ssa1virtual_ours.mp4 --fps 10 --quality 80)",
+      "Bash(conda run *)"
+    ]
+  }
+}
