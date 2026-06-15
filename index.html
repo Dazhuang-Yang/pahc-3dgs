@@ -95,19 +95,19 @@
           <div class="columns is-centered metric-row mt-5">
             <div class="column is-one-third">
               <div class="metric-box">
-                <div class="metric-value">8&times;</div>
+                <div class="metric-value">&gt; 5.5&times;</div>
                 <div class="metric-label">storage compression</div>
               </div>
             </div>
             <div class="column is-one-third">
               <div class="metric-box">
-                <div class="metric-value">~2 MB</div>
+                <div class="metric-value">~ 2 MB</div>
                 <div class="metric-label">compact payload</div>
               </div>
             </div>
             <div class="column is-one-third">
               <div class="metric-box">
-                <div class="metric-value">&gt;30 dB</div>
+                <div class="metric-value">&gt; 30 dB</div>
                 <div class="metric-label">high-fidelity rendering</div>
               </div>
             </div>
@@ -126,10 +126,13 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            While 3D Gaussian Splatting (3DGS) has revolutionized real-time rendering with high visual fidelity, its unstructured and discrete nature poses significant challenges for efficient storage and transmission, especially in bandwidth-constrained space-ground communications. Existing compression paradigms rely on signal redundancy, often leading to geometric collapse on complex structures at extreme bitrates. To overcome these limitations, we propose a physics-aware hierarchical 3DGS compression framework tailored for aerospace objects. Our approach reconfigures the compression paradigm, departing from conventional pixel-level entropy coding toward semantic-oriented component reorganization. Specifically, a geometry layer condenses repetitive structures into compact meta-templates via a coarse-to-fine cascade: spectral divergence pruning, robust rigid alignment, and alternating differentiable refinement. Subsequently, an appearance layer exploits material sparsity through component-wise manifold vector quantization.
-            Extensive evaluations on the Spacecraft Pose Estimation and 3D Reconstruction Dataset (SPARD) demonstrate that our method effectively addresses the rate-distortion bottlenecks of current compression paradigms. 
-            It achieves an approximately 8$\times$ storage compression ratio, compressing the explicit 3D representation to about 2 MB while maintaining high-fidelity visual quality above 30 dB.
-            By synergistically decoupling spatial topology and material statistics, our method preserves structural integrity and delivers a robust, high efficiency 3D representation for on-orbit servicing tasks.
+          While 3D Gaussian Splatting (3DGS) has revolutionized real-time photorealistic rendering, its unstructured and discrete nature incurs substantial storage and transmission overhead, impeding its deployment on resource-constrained edge platforms.
+          Existing 3DGS compression methods are predominantly driven by signal-level redundancy, leaving object-level structural regularity and material sparsity untapped in industrial assets such as aerospace targets. 
+          To explicitly capitalize on these physical priors, we propose a physics-aware hierarchical 3DGS framework that shifts the compression paradigm toward semantic-level structural reassembly.
+          Specifically, a geometry layer condenses repetitive structures into compact meta templates via a coarse-to-fine cascade: spectral divergence pruning, robust rigid alignment, and alternating differentiable refinement. Subsequently, an appearance layer exploits material sparsity through component-wise vector quantization.
+          Extensive evaluations across diverse aerospace scenarios, including high-fidelity synthetic models and real-world mock-ups, demonstrate that our method effectively copes with the rate-distortion bottlenecks of current compression paradigms. 
+          It reduces the explicit 3D representation to approximately 2 MB, achieving a storage compression ratio of at least 5.5$\times$ while maintaining high-fidelity visual quality above 30 dB.
+          By synergistically decoupling spatial topology and material statistics, our method preserves structural integrity and delivers a robust, memory-efficient 3D representation for bandwidth-constrained autonomous perception.
           </p>
         </div>
       </div>
