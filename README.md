@@ -1,7 +1,7 @@
-# Physics-Aware Hierarchical 3DGS Compression
+# Hierarchical Prototype Sharing for 3D Gaussian Splatting Compression of Aerospace Objects
 
 Project page and assets for the TAES paper:
 
-**Physics-Aware Hierarchical 3DGS Compression: An Efficient Representation for Aerospace Objects**
+**Hierarchical Prototype Sharing for 3D Gaussian Splatting Compression of Aerospace Objects**
 
-The deployed site lives in `index.html` and uses figures copied from `E:\Satellite Defend\paper\gs-zip\taes`.
+The deployed site lives in `index.html` and uses figures copied from `..\gs-zip\taes`.
